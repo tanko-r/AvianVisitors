@@ -1,0 +1,38 @@
+#!/bin/sh
+# Restricted convenience wrapper for the one backed-up PF1007L frame.
+set -eu
+
+SERIAL=__FRAME_SERIAL__
+ADB=/usr/bin/adb
+
+usage() {
+    echo "usage: avian-frame-adb {wait|status|shell [command...]}" >&2
+    exit 64
+}
+
+case "${1:-}" in
+    wait)
+        timeout="${2:-120}"
+        "$ADB" start-server >/dev/null
+        end=$(( $(date +%s) + timeout ))
+        while [ "$(date +%s)" -lt "$end" ]; do
+            if "$ADB" -s "$SERIAL" get-state 2>/dev/null | grep -qx device; then
+                echo "Frame ADB ready: $SERIAL"
+                exit 0
+            fi
+            sleep 2
+        done
+        echo "Frame not found on direct USB: $SERIAL" >&2
+        exit 1
+        ;;
+    status)
+        "$ADB" start-server >/dev/null
+        "$ADB" devices -l
+        "$ADB" -s "$SERIAL" get-state 2>/dev/null || true
+        ;;
+    shell)
+        shift
+        "$ADB" -s "$SERIAL" shell "$@"
+        ;;
+    *) usage ;;
+esac

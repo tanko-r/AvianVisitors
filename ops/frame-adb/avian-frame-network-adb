@@ -1,0 +1,104 @@
+#!/bin/sh
+# Temporarily expose the PF1007L's root ADB only to this Pi's current wlan0 IP.
+#
+# This must be run from the Pi while the frame is attached over direct USB.
+# Network ADB is deliberately not persistent: an Android reboot or a new Wi-Fi
+# requires this explicit, attended enablement again.
+set -eu
+
+SERIAL=__FRAME_SERIAL__
+ADB=/usr/bin/adb
+WLAN=wlan0
+
+usage() {
+    echo "usage: avian-frame-network-adb {discover|enable|disable|connect ADDRESS}" >&2
+    exit 64
+}
+
+pi_address() {
+    /usr/sbin/ip -o -4 addr show dev "$WLAN" scope global | \
+        /usr/bin/awk 'NR == 1 { sub(/\/.*/, "", $4); print $4 }'
+}
+
+valid_ipv4() {
+    /usr/bin/awk -v ip="$1" '
+        BEGIN {
+            n = split(ip, octet, ".")
+            if (n != 4) exit 1
+            for (i = 1; i <= 4; i++)
+                if (octet[i] !~ /^[0-9]+$/ || octet[i] > 255) exit 1
+        }'
+}
+
+require_usb() {
+    "$ADB" start-server >/dev/null
+    [ "$("$ADB" -s "$SERIAL" get-state 2>/dev/null || true)" = device ] || {
+        echo "Frame is not available on direct USB: $SERIAL" >&2
+        exit 1
+    }
+}
+
+case "${1:-}" in
+    discover)
+        # Do not scan the LAN.  A frame address is usable only after its
+        # restricted frameview account has authenticated to this Pi.
+        found=0
+        /usr/bin/journalctl -u ssh --since '-8 hours' --no-pager -o cat | \
+            /usr/bin/sed -n 's/.*Accepted [^ ]* for frameview from \([0-9.][0-9.]*\).*/\1/p' | \
+            /usr/bin/sort -u | while IFS= read -r address; do
+                valid_ipv4 "$address" || continue
+                route=$(/usr/sbin/ip route get "$address" 2>/dev/null || true)
+                case "$route" in
+                    *" dev $WLAN "*) printf '%s\n' "$address"; found=1 ;;
+                esac
+            done
+        # A successful empty result is intentional: no authenticated frame
+        # connection means there is nothing safe to target.
+        exit 0
+        ;;
+    enable)
+        pi=$(pi_address)
+        valid_ipv4 "$pi" || { echo "No usable IPv4 address on $WLAN" >&2; exit 1; }
+        require_usb
+        # adbd on this Android 6 frame is root and unauthenticated.  Install
+        # an INPUT chain first, then start its TCP listener.  IPv6 is rejected
+        # explicitly so it cannot bypass the IPv4 source restriction.
+        "$ADB" -s "$SERIAL" shell sh -c '
+            set -eu
+            pi=$1
+            iptables -N AVIAN_ADB 2>/dev/null || true
+            iptables -F AVIAN_ADB
+            iptables -A AVIAN_ADB -s "$pi" -p tcp --dport 5555 -j ACCEPT
+            iptables -A AVIAN_ADB -p tcp --dport 5555 -j REJECT
+            iptables -C INPUT -p tcp --dport 5555 -j AVIAN_ADB 2>/dev/null || \
+                iptables -I INPUT -p tcp --dport 5555 -j AVIAN_ADB
+            ip6tables -C INPUT -p tcp --dport 5555 -j REJECT 2>/dev/null || \
+                ip6tables -I INPUT -p tcp --dport 5555 -j REJECT
+            setprop service.adb.tcp.port 5555
+            stop adbd
+            start adbd
+        ' sh "$pi"
+        echo "Network ADB enabled for this Pi only ($pi). Run discover, then connect."
+        ;;
+    disable)
+        require_usb
+        "$ADB" -s "$SERIAL" shell sh -c '
+            setprop service.adb.tcp.port -1
+            stop adbd
+            start adbd
+            iptables -D INPUT -p tcp --dport 5555 -j AVIAN_ADB 2>/dev/null || true
+            iptables -F AVIAN_ADB 2>/dev/null || true
+            iptables -X AVIAN_ADB 2>/dev/null || true
+            ip6tables -D INPUT -p tcp --dport 5555 -j REJECT 2>/dev/null || true
+        '
+        echo "Network ADB disabled."
+        ;;
+    connect)
+        [ "$#" = 2 ] && valid_ipv4 "$2" || usage
+        # Caller supplies only an address returned by discover.  This avoids
+        # accidentally connecting a root ADB client to an arbitrary LAN host.
+        "$ADB" connect "$2:5555"
+        "$ADB" -s "$2:5555" get-state
+        ;;
+    *) usage ;;
+esac

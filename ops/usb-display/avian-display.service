@@ -1,0 +1,21 @@
+[Unit]
+Description=AvianVisitors virtual display (private VNC)
+After=caddy.service
+Wants=caddy.service
+[Service]
+Type=simple
+User=david
+Group=david
+Environment=HOME=/home/david
+Environment=XDG_RUNTIME_DIR=/run/avian-display
+RuntimeDirectory=avian-display
+RuntimeDirectoryMode=0700
+ExecStart=/usr/bin/dbus-run-session -- /usr/bin/tigervncserver -fg :1 -geometry 1280x800 -depth 24 -localhost yes -SecurityTypes VncAuth -PasswordFile /home/david/.config/avian-display/vnc.passwd -xstartup /home/david/.local/lib/avianvisitors/start-desktop
+Restart=always
+RestartSec=5
+Nice=5
+OOMScoreAdjust=300
+MemoryMax=900M
+TimeoutStopSec=20
+[Install]
+WantedBy=multi-user.target
