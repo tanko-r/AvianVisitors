@@ -84,6 +84,9 @@
   var SWITCH_LEAD = SLIDE_MS - 100;   // atlas
   var STATS_LEAD = SLIDE_MS - 200;    // stats - begin a touch sooner
   var currentView = 0;                // collage shows first (no go() needed)
+  // Android 6 can re-hit-test a delayed compatibility click after the view
+  // moves beneath the same finger. Keep that touch from opening the collage.
+  var suppressCollageTapUntil = 0;
   function go(i) {
     i = Math.max(0, Math.min(2, i));
     // Only a genuine view *switch* replays the entrance. go() also fires when
@@ -91,6 +94,7 @@
     // while already on the atlas - that must not retrigger the load-in.
     var switching = (i !== currentView);
     currentView = i;
+    if (switching && i === 0) suppressCollageTapUntil = Date.now() + SLIDE_MS + 160;
     views.style.transform = 'translateX(-' + (i * 100) + '%)';
     btns.forEach(function (b, j) { b.setAttribute('aria-current', j === i ? 'true' : 'false'); });
     syncPill(slider);
@@ -102,7 +106,19 @@
     else if (i === 1) playStatsEntrance(STATS_LEAD);
     else if (i === 2) playAtlasEntrance(SWITCH_LEAD);
   }
-  btns.forEach(function (b) { b.addEventListener('click', function () { go(+b.dataset.i); }); });
+  btns.forEach(function (b) {
+    var lastTouch = 0;
+    b.addEventListener('touchstart', function (ev) {
+      // Move on touch-down; discard WebView's later synthetic click.
+      lastTouch = Date.now();
+      ev.preventDefault();
+      go(+b.dataset.i);
+    }, { passive: false });
+    b.addEventListener('click', function (ev) {
+      if (Date.now() - lastTouch < 800) { ev.preventDefault(); return; }
+      go(+b.dataset.i);
+    });
+  });
 
   // ---- Window picker ----
   // Persist selections across reloads so a returning visitor lands on the
@@ -745,6 +761,7 @@
     if (tip) tip.setAttribute('aria-hidden', 'true');
   });
   collage.addEventListener('click', function (ev) {
+    if (Date.now() < suppressCollageTapUntil) return;
     var hit = maskHitTest(ev.clientX, ev.clientY);
     if (!hit) return;
     location.hash = '#sci=' + encodeURIComponent(hit.data.sci);
