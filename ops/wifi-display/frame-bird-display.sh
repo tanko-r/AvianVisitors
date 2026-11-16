@@ -8,6 +8,9 @@ until [ "$(getprop sys.boot_completed)" = 1 ] || [ "$t" -ge 180 ]; do
 done
 [ "$(getprop sys.boot_completed)" = 1 ] || exit 0
 sleep 12
+# Keep the Android panel off overnight while leaving Wi-Fi and the AVNC session
+# available.  The helper is independent of the companion's enabled setting.
+/system/bin/frame-display-schedule.sh --boot &
 # Keep an explicit pause effective across boots.
 grep -q 'name="enabled" value="true"' /data/data/com.avianvisitors.display/shared_prefs/display.xml || exit 0
 # Launch the exported native activity first. This vendor build does not start

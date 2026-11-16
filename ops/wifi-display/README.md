@@ -18,6 +18,13 @@ after Wi-Fi works; the frame uses its original wall adapter.
   startup. The helper's saved opt-in is checked before doing this.
   **Android Settings** and **Home HQ** explicitly pause discovery until the
   owner selects Open bird display again. Installation alone enables nothing.
+- The system boot hook also starts `frame-display-schedule.sh`.  It sends the
+  Android panel an explicit sleep event at 22:30 and wake event at 05:30 every
+  day, using the frame's local clock.  Android, Wi-Fi, AVNC and the Pi's bird
+  analysis remain running overnight.  Both helper scripts must be installed at
+  `/system/bin/` with owner `root:root` and mode `0755`, then `/system` must be
+  remounted read-only again.  Test the two key events manually before relying
+  on the schedule: `input keyevent 223` (sleep) and `input keyevent 224` (wake).
 - The foreground service discovers exactly `AvianVisitors-Dad-491`,
   `_http._tcp`. This vendor Android 6 build returns zero TXT attributes, so
   discovery requires the exact service instance name and the subsequent SSH

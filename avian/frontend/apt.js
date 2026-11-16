@@ -163,6 +163,20 @@
   applyTheme(readLS('bird:theme', 'light'));
   var winBtns = [].slice.call(winPick.querySelectorAll('button'));
   var currentHours = +readLS('bird:window', '24') || 24;
+  var newFriends = document.getElementById('newFriends');
+  newFriends.checked = readLS('bird:newFriends', 'false') === 'true';
+  function recentUrl() {
+    newFriends.disabled = currentHours >= 1000000;
+    newFriends.parentNode.title = newFriends.disabled ? 'Choose a time period to find new friends' :
+      'Heard in this period, but absent in the preceding ' + (currentHours === 168 ? 60 : 10) + ' days';
+    return './avian/api/birdnet-api.php?action=recent&hours=' + (currentHours === -1 ? 24 : currentHours) +
+      (currentHours === -1 ? '&period=overnight' : '') +
+      (newFriends.checked && !newFriends.disabled ? '&new_friends=1' : '');
+  }
+  newFriends.addEventListener('change', function () {
+    writeLS('bird:newFriends', String(newFriends.checked));
+    refreshRecent(true);
+  });
   winBtns.forEach(function (b) {
     b.setAttribute('aria-current', (+b.dataset.h === currentHours) ? 'true' : 'false');
   });
@@ -832,6 +846,7 @@
   // a bare "window" with the span it actually covers. Thresholds match
   // the winPick buttons (1H / 12H / 24H / 7D / ALL).
   function windowLabel(h) {
+    if (h === -1) return 'overnight';
     if (h <= 1) return 'this hour';
     if (h <= 12) return 'past 12h';
     if (h <= 24) return 'today';
@@ -1166,7 +1181,8 @@
     // to the life list this 1h / 12h / 24h / 7d. Never shown for the ALL
     // window (every species would qualify against an open-ended span).
     var now = Date.now();
-    var windowStartMs = now - currentHours * 3600000;
+    var windowStartMs = DATA.recent && DATA.recent.period
+      ? Date.parse(DATA.recent.period.start.replace(' ', 'T')) : now - currentHours * 3600000;
     grid.innerHTML = species.map(function (s) {
       var total = +s.n || 0;
       var win = winBySci[s.sci] || 0;
@@ -1364,21 +1380,23 @@
     // lands later - we discard the stale response so the collage
     // never reverts to a different window.
     var forHours = currentHours;
-    return fetchJson('./avian/api/birdnet-api.php?action=recent&hours=' + forHours)
+    var forUrl = recentUrl();
+    return fetchJson(forUrl)
       .then(function (j) {
-        if (forHours !== currentHours) return; // window changed mid-flight
+        if (forHours !== currentHours || forUrl !== recentUrl()) return;
         DATA.recent = j; renderWindowDependent(animate);
       })
       .catch(function (e) { console.warn('recent fetch failed', e); });
   }
   function refreshAll(animate) {
     var forHours = currentHours;
+    var forUrl = recentUrl();
     return Promise.all([
       fetchJson('./avian/api/birdnet-api.php?action=stats').catch(function () { return null; }),
       fetchJson('./avian/api/birdnet-api.php?action=lifelist').catch(function () { return null; }),
       fetchJson('./avian/api/birdnet-api.php?action=timeseries&days=30').catch(function () { return null; }),
       fetchJson('./avian/api/birdnet-api.php?action=firstseen&limit=10').catch(function () { return null; }),
-      fetchJson('./avian/api/birdnet-api.php?action=recent&hours=' + forHours).catch(function () { return null; }),
+      fetchJson(forUrl).catch(function () { return null; }),
     ]).then(function (parts) {
       DATA.stats = parts[0];
       DATA.lifelist = parts[1];
@@ -1386,7 +1404,7 @@
       DATA.firstseen = parts[3];
       // Only accept the recent slice if the window hasn't changed
       // since this poll started - otherwise keep what's there.
-      if (forHours === currentHours && parts[4]) DATA.recent = parts[4];
+      if (forHours === currentHours && forUrl === recentUrl() && parts[4]) DATA.recent = parts[4];
       recomputeDerived();
       renderTimeIndependent(animate);
       renderCollageFromData(animate);
