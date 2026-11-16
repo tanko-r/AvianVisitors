@@ -184,6 +184,12 @@
   // Collage used to open the bird now sitting underneath the Collage button.
   // Ignore collage hit-tests until that slide has finished settling.
   var suppressCollageTapUntil = 0;
+  function resetStageOffset() {
+    var stage = document.querySelector('.stage');
+    if (stage) { stage.scrollLeft = 0; stage.scrollTop = 0; }
+  }
+  // Fallback for browsers that do not support overflow:clip.
+  document.querySelector('.stage').addEventListener('scroll', resetStageOffset);
   function go(i, options) {
     options = options || {};
     i = Math.max(0, Math.min(2, i));
@@ -192,6 +198,11 @@
     // while already on the atlas - that must not retrigger the load-in.
     var switching = (i !== currentView);
     currentView = i;
+    resetStageOffset();
+    [].forEach.call(views.querySelectorAll('.view'), function (pane, index) {
+      pane.inert = index !== i;
+      pane.setAttribute('aria-hidden', String(index !== i));
+    });
     if (switching && i === 0) suppressCollageTapUntil = Date.now() + SLIDE_MS + 160;
     if (options.persist !== false) writeLS(VIEW_STORAGE_KEY, String(i));
     views.style.transform = 'translateX(-' + (i * 100) + '%)';
@@ -8961,7 +8972,10 @@
       card.setAttribute('data-active', 'true');
       card.setAttribute('data-pulse', 'true');
       setTimeout(function () { card.removeAttribute('data-pulse'); }, 520);
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (currentView !== 2 || document.body.classList.contains('postcard-open')) return;
+      var pane = document.getElementById('v2');
+      var cardRect = card.getBoundingClientRect(), paneRect = pane.getBoundingClientRect();
+      pane.scrollTop += cardRect.top - paneRect.top - (pane.clientHeight - cardRect.height) / 2;
     })();
   }
 
@@ -14680,6 +14694,8 @@
   }
 
   function preparePostcardShell() {
+    resetStageOffset();
+    document.querySelector('.stage').inert = true;
     // Initial #sci= deep links are routed before the click-flight wiring at
     // the end of this file runs. Resolve the shell lazily so a refreshed deep
     // link opens the same postcard instead of only pre-populating hidden DOM.
@@ -14838,6 +14854,8 @@
       postcardModal.setAttribute('aria-hidden', 'true');
     }
     document.body.classList.remove('postcard-open');
+    document.querySelector('.stage').inert = false;
+    resetStageOffset();
     if (postcardSlot) postcardSlot.replaceChildren();
     ['modalCommon', 'modalSci', 'modalRecCount'].forEach(function (id) {
       var node = document.getElementById(id);
@@ -14876,6 +14894,8 @@
   }
   function closePostcard() {
     if (!postcardModal || postcardModal.getAttribute('aria-hidden') === 'true') return;
+    document.querySelector('.stage').inert = false;
+    resetStageOffset();
     var drawerSheet = postcardDrawerSheet();
     var drawerDrivenClose = postcardModal.classList.contains('is-drawer-closing') ||
       (drawerSheet && drawerSheet.classList.contains('is-drawer-closing'));

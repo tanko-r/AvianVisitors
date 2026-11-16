@@ -71,6 +71,9 @@
      from the current one. */
   .stage {
     position: fixed; inset: 0; overflow: hidden;
+    /* A clipped viewport must never acquire an independent scroll offset
+       when Chromium reveals a focused control or an off-screen Atlas card. */
+    overflow: clip;
     display: flex; flex-direction: column;
   }
   .static-head {
