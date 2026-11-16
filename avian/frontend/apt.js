@@ -781,7 +781,7 @@
   }
   function scopedFetchJson(action, params, request) {
     request = request || educatorScopeRequest();
-    var friendsAtRequest = newFriends && newFriends.checked;
+    var friendsAtRequest = newFriendsActive;
     var hoursAtRequest = currentHours;
     if (newFriends) newFriends.disabled = currentHours >= 1000000 || !!educatorScopeId();
     if (action === 'recent' && !request.scopeId && !educatorScopeId()) {
@@ -795,7 +795,7 @@
       return Promise.reject(obsolete);
     }
     return fetchJson(birdApiUrl(action, params, request.scopeId)).then(function (payload) {
-      if (action === 'recent' && (hoursAtRequest !== currentHours || friendsAtRequest !== (newFriends && newFriends.checked))) {
+      if (action === 'recent' && (hoursAtRequest !== currentHours || friendsAtRequest !== newFriendsActive)) {
         throw new Error('stale bird filter');
       }
       if (!adoptEducatorScope(payload, request.scopeId, request.generation)) {
@@ -1085,10 +1085,13 @@
   var winBtns = [].slice.call(winPick.querySelectorAll('button'));
   var currentHours = +readLS('bird:window', '24') || 24;
   var newFriends = document.getElementById('newFriends');
-  newFriends.checked = readLS('bird:newFriends', 'false') === 'true';
+  var newFriendsActive = readLS('bird:newFriends', 'false') === 'true';
+  newFriends.setAttribute('aria-pressed', String(newFriendsActive));
   newFriends.title = 'Absent in the 10 days before this period (60 days for 7D)';
-  newFriends.addEventListener('change', function () {
-    writeLS('bird:newFriends', String(newFriends.checked));
+  newFriends.addEventListener('click', function () {
+    newFriendsActive = !newFriendsActive;
+    newFriends.setAttribute('aria-pressed', String(newFriendsActive));
+    writeLS('bird:newFriends', String(newFriendsActive));
     refreshRecent(true); refreshStatsContext(true);
   });
   winBtns.forEach(function (b) {
@@ -4483,7 +4486,7 @@
     var html = '<table class="heatmap-table' + (hourCount > 8 ? ' heatmap-compressed' : '') + '"><thead><tr><th class="heatmap-corner" aria-label="species"></th>';
     for (var hh = rng.from; hh <= rng.to; hh++) {
       var majorHour = hourCount <= 12 || hh % 3 === 0 || hh === rng.to;
-      html += '<th class="heatmap-hour' + (majorHour ? ' heatmap-hour-major' : '') + '">' + (hh % 12 || 12) + (hh < 12 ? 'a' : 'p') + '</th>';
+      html += '<th class="heatmap-hour' + (majorHour ? ' heatmap-hour-major' : '') + '">' + (hh % 12 || 12) + (hh < 12 ? ' AM' : ' PM') + '</th>';
     }
     html += '<th class="heatmap-total">total</th></tr></thead><tbody>';
     rowsArr.forEach(function (s) {

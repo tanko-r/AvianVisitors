@@ -14,7 +14,7 @@
 function systemTheme(){try{return window.matchMedia&&window.matchMedia(q).matches?'dark':'light';}catch(e){return'light';}}
 function preference(){try{var v=localStorage.getItem('bird:theme:v2');if(v==='auto'||v==='light'||v==='dark')return v;var old=localStorage.getItem('bird:theme');return old==='light'||old==='dark'?old:'auto';}catch(e){return'auto';}}
 var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemTheme());})();</script>
-  <link rel="stylesheet" href="./styles.css?v=r196">
+  <link rel="stylesheet" href="./styles.css?v=frame-20261116-3">
   <link rel="stylesheet" href="./bundles.css?v=r3">
   <link rel="stylesheet" href="./stamps.css?v=r355">
   <link rel="stylesheet" href="./stamp-batch-root.css?v=r254">
@@ -49,6 +49,7 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
     <button data-h="-1" type="button">Overnight</button>
     <button data-h="1000000" type="button">ALL</button>
   </div>
+  <button type="button" class="new-friends" id="newFriends" aria-pressed="false">New Friends</button>
 </header>
 
 <!-- The menu button IS its card: one shell, fixed to the top-right
@@ -329,7 +330,6 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <button type="button" data-i="1">stats</button>
   <button type="button" data-i="2">atlas</button>
 </nav>
-<label class="new-friends"><input type="checkbox" id="newFriends"> New friends</label>
 
 
 <!-- Native Settings, System, Logs, Tools, and Educators views render here. The live JS
@@ -401,6 +401,6 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <script src="./stamp-batch-b.js?v=r318"></script>
 <script src="./stamp-batch-c.js?v=r235"></script>
 <script src="./bundle-ui.js?v=r11"></script>
-<script src="./apt.js?v=r242"></script>
+<script src="./apt.js?v=frame-20261116-3"></script>
 </body>
 </html>
