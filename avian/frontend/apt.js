@@ -3640,7 +3640,6 @@
     var hit = maskHitTest(ev.clientX, ev.clientY);
     if (!hit) return;
     location.hash = '#sci=' + encodeURIComponent(hit.data.sci);
-    go(2);
   });
 
   // Debug hook - call __layout({ slugs, weights, n }) from devtools to
@@ -14391,7 +14390,8 @@
       location.hash = '#sci=' + encodeURIComponent(sci);
     } else {
       // Same hash -> still re-highlight (the user clicked it again).
-      go(2); highlightAtlas(sci);
+      if (currentView === 2) highlightAtlas(sci);
+      openDetailModal(sci);
     }
   }
 
