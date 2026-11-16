@@ -58,8 +58,12 @@
     overflow: hidden;
   }
   .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.02em; }
-  .new-friends { position: fixed; bottom: 7px; left: 50%; transform: translateX(-50%); z-index: 30; font: 12px ui-monospace, monospace; color: var(--ink-2); cursor: pointer; }
-  .new-friends input { accent-color: var(--ink); }
+  .new-friends { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 30; display: flex; align-items: center; gap: 9px; min-height: 32px; padding: 0 15px; border-radius: 999px; background: var(--paper-2); box-shadow: var(--recess); font: 10px ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); cursor: pointer; }
+  .new-friends input { appearance: none; -webkit-appearance: none; width: 24px; height: 14px; margin: 0; border-radius: 999px; background: var(--paper); box-shadow: var(--recess); cursor: pointer; }
+  .new-friends input::before { content: ''; display: block; width: 10px; height: 10px; margin: 2px; border-radius: 50%; background: var(--ink-soft); transition: transform 160ms; }
+  .new-friends input:checked::before { transform: translateX(10px); background: var(--ink); }
+  .new-friends input:disabled { opacity: .4; }
+  .period-caption { margin: 8px 0 0; font: 11px ui-monospace, monospace; color: var(--ink-soft); }
 
   /* ============ Stage / views ============
      Stage is a flex column: a static title block sits on top, the views
@@ -256,7 +260,7 @@
 
   /* ============ Bottom slider - recessed track, raised active pill ============ */
   .slider {
-    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 56px; left: 50%; transform: translateX(-50%);
     display: flex; align-items: center; gap: 0; padding: 4px; z-index: 30;
     min-height: 40px; box-sizing: border-box;
     background: var(--paper-2); border-radius: 999px;
@@ -3501,7 +3505,7 @@ body.postcard-open { overflow: hidden; }
     .educator-stat { font-size: 9px; }
     .educator-live .live-audio[data-state="streaming"] + .live-spectro { height: 150px; }
     /* Slider track bottom nav: tuck closer to bottom edge */
-    .slider { bottom: 14px; min-height: 34px; padding: 3px; }
+    .slider { bottom: 56px; min-height: 34px; padding: 3px; }
     .slider button {
       display: inline-flex; align-items: center; justify-content: center;
       min-height: 28px; font-size: 9.5px; padding: 0 11px;

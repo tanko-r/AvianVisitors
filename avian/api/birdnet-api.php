@@ -411,6 +411,7 @@ switch ($action) {
             'midnight_clamped' => $window['midnight_clamped'],
             'window_start' => $window['window_start'],
             'overnight' => $overnight, 'new_friends' => $newFriends,
+            'window_end' => $bind[':anchor'], 'timezone' => 'America/Los_Angeles',
             'species' => $rs, 'site_name' => publicSiteName($CONF_PATH), 'as_of' => date('c')
         ]);
         break;

@@ -3671,6 +3671,17 @@
   // changes, refreshRecent() refetches and re-renders. Empty state shows
   // the shared "no detections heard in this window" message.
   function renderCollageFromData(animate) {
+    var caption = document.getElementById('periodCaption');
+    var recent = DATA.recent;
+    if (caption) {
+      caption.hidden = currentHours !== -1 || !recent || !recent.overnight;
+      if (!caption.hidden) {
+        function bound(s) {
+          return s.slice(5, 10).replace('-', '/') + ' ' + clock12(+s.slice(11, 13), +s.slice(14, 16));
+        }
+        caption.textContent = bound(recent.window_start) + ' – ' + bound(recent.window_end) + ' Pacific';
+      }
+    }
     if (!DATA.recent || !Array.isArray(DATA.recent.species)) return;
     renderCollage(DATA.recent.species, animate);
   }
@@ -3693,6 +3704,10 @@
     return '<li' + attr + '><span class="yr">' + yr + '</span><span>' + label + '</span><span class="ct">' + (ct == null ? '-' : ct) + '</span></li>';
   }
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function clock12(hour, minute) {
+    hour = ((hour % 24) + 24) % 24;
+    return (hour % 12 || 12) + ':' + pad(minute || 0) + (hour < 12 ? ' AM' : ' PM');
+  }
   function fmtN(n) {
     if (n == null) return '-';
     if (n >= 10000) return (n / 1000).toFixed(1) + 'k';
@@ -3870,7 +3885,7 @@
       var d = new Date(ms);
       var p2 = function (n) { return n < 10 ? '0' + n : '' + n; };
       if (educatorScopeId()) return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-      if (currentHours <= 36) return p2(d.getHours()) + ':' + p2(d.getMinutes());
+      if (currentHours <= 36) return clock12(d.getHours(), d.getMinutes());
       if (currentHours <= 75 * 24) return (d.getMonth() + 1) + '/' + d.getDate();
       return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
@@ -4229,13 +4244,13 @@
     var domainLast = Math.max(1, endS - startS);
     var fmtMin = function (i) {
       var slot = startS + i;
-      return pad(Math.floor(slot / 60)) + ':' + pad(slot % 60);
+      return clock12(Math.floor(slot / 60), slot % 60);
     };
     var fmtRate = function (v) { return Math.round(v) + '/hr'; };
     var ticks = [], tickCount = Math.min(4, domainLast);
     for (var ti = 0; ti <= tickCount; ti++) {
       var sl = startS + Math.round(domainLast * ti / tickCount);
-      ticks.push({ f: (sl - startS) / domainLast, text: pad(Math.floor(sl / 60)) + ':' + pad(sl % 60) });
+      ticks.push({ f: (sl - startS) / domainLast, text: clock12(Math.floor(sl / 60), sl % 60) });
     }
     rhLineChart(host,
       [{ cls: 'ln-avg', vals: avg,
@@ -4469,7 +4484,7 @@
     var html = '<table class="heatmap-table' + (hourCount > 8 ? ' heatmap-compressed' : '') + '"><thead><tr><th class="heatmap-corner" aria-label="species"></th>';
     for (var hh = rng.from; hh <= rng.to; hh++) {
       var majorHour = hourCount <= 12 || hh % 3 === 0 || hh === rng.to;
-      html += '<th class="heatmap-hour' + (majorHour ? ' heatmap-hour-major' : '') + '">' + pad(hh) + '</th>';
+      html += '<th class="heatmap-hour' + (majorHour ? ' heatmap-hour-major' : '') + '">' + (hh % 12 || 12) + (hh < 12 ? 'a' : 'p') + '</th>';
     }
     html += '<th class="heatmap-total">total</th></tr></thead><tbody>';
     rowsArr.forEach(function (s) {
@@ -8974,7 +8989,7 @@
     try {
       var date = new Date(d + 'T' + (t || '00:00:00'));
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) +
-        ' - ' + (t ? t.slice(0, 5) : '');
+        ' - ' + (t ? clock12(date.getHours(), date.getMinutes()) : '');
     } catch (e) { return d + ' ' + (t || ''); }
   }
   function rarityLabel(total, firstSeenIso) {
@@ -11033,7 +11048,7 @@
   function educatorDateLabel(value) {
     var date = new Date(value || '');
     if (isNaN(date.getTime())) return '';
-    return date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    return date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
   }
   function educatorCaptureAccessibleLabel(capture, duration, started) {
     var birds = capture.species_count === null ? '' : String(capture.species_count);
@@ -13675,7 +13690,7 @@
 
   // Initial load: if URL has a sci hash, jump to atlas, highlight, and
   // open the modal.
-  if (readHash() && !educatorScopeBlocked) { go(2); highlightAtlas(readHash()); openDetailModal(readHash()); }
+  if (readHash() && !educatorScopeBlocked) { if (currentView === 2) highlightAtlas(readHash()); openDetailModal(readHash()); }
   // Admin overlay routing accepts only exact native admin section names.
   // screen with that sub-tab. Clearing the hash closes it.
   function readAdminHash() {
@@ -13695,7 +13710,7 @@
     if (location.hash === '#about') openAbout(); else closeAbout();
     if (adm) { openAdmin(adm); return; }
     closeAdmin();
-    if (sci && !educatorScopeBlocked) { go(2); highlightAtlas(sci); openDetailModal(sci); }
+    if (sci && !educatorScopeBlocked) { if (currentView === 2) highlightAtlas(sci); openDetailModal(sci); }
     else { highlightAtlas(null); closeDetailModal(); }
   }
   if (readAdminHash()) openAdmin(readAdminHash());
