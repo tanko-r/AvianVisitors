@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+export XDG_SESSION_TYPE=x11
+/usr/bin/openbox --sm-disable &
+exec /usr/bin/chromium --ozone-platform=x11 --kiosk --no-first-run --no-default-browser-check --disable-session-crashed-bubble --disable-dev-shm-usage --disable-gpu --user-data-dir=/home/david/.config/avian-display/chromium 'http://127.0.0.1/?performance=lite'

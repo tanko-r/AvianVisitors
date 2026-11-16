@@ -1,4 +1,17 @@
 (function () {
+  // The PF1007L's Android 6 renderer needs a smaller graphics/layout workload.
+  // Keep the regular presentation elsewhere; query overrides make comparison reversible.
+  var performanceMode = new URLSearchParams(location.search).get('performance');
+  var lowPowerFrame = performanceMode === 'lite' ||
+    (performanceMode !== 'full' && /Android 6\.0.*AEEZO/.test(navigator.userAgent));
+  var collageDirty = false, atlasDirty = false;
+  if (lowPowerFrame) {
+    var performanceStyle = document.createElement('style');
+    performanceStyle.id = 'avian-low-power';
+    performanceStyle.textContent = '*{filter:none!important;backdrop-filter:none!important;' +
+      '-webkit-backdrop-filter:none!important;transition:none!important}';
+    document.head.appendChild(performanceStyle);
+  }
   var PLACEHOLDER = [{ "sci": "Calypte anna", "com": "Anna's Hummingbird", "featured": true }, { "sci": "Passer domesticus", "com": "House Sparrow" }, { "sci": "Haemorhous mexicanus", "com": "House Finch" }, { "sci": "Turdus migratorius", "com": "American Robin" }, { "sci": "Zenaida macroura", "com": "Mourning Dove" }, { "sci": "Spinus psaltria", "com": "Lesser Goldfinch" }, { "sci": "Zonotrichia leucophrys", "com": "White-crowned Sparrow" }, { "sci": "Aphelocoma californica", "com": "California Scrub-Jay" }, { "sci": "Mimus polyglottos", "com": "Northern Mockingbird" }, { "sci": "Sayornis nigricans", "com": "Black Phoebe" }, { "sci": "Larus occidentalis", "com": "Western Gull" }, { "sci": "Corvus brachyrhynchos", "com": "American Crow" }];
   // Library-wide revision for a full offline sketch rebuild. One-species
   // corrections use ART_REVISIONS below.
@@ -166,6 +179,11 @@
   // Resolve the saved sheet before routing so refreshes land directly on
   // the view the visitor left, without briefly replaying the default view.
   var currentView = readSavedView();
+  // Android 6 can retarget a synthetic click after a fixed control changes
+  // the transformed view beneath the same finger.  In particular, Atlas →
+  // Collage used to open the bird now sitting underneath the Collage button.
+  // Ignore collage hit-tests until that slide has finished settling.
+  var suppressCollageTapUntil = 0;
   function go(i, options) {
     options = options || {};
     i = Math.max(0, Math.min(2, i));
@@ -174,6 +192,7 @@
     // while already on the atlas - that must not retrigger the load-in.
     var switching = (i !== currentView);
     currentView = i;
+    if (switching && i === 0) suppressCollageTapUntil = Date.now() + SLIDE_MS + 160;
     if (options.persist !== false) writeLS(VIEW_STORAGE_KEY, String(i));
     views.style.transform = 'translateX(-' + (i * 100) + '%)';
     btns.forEach(function (b, j) { b.setAttribute('aria-current', j === i ? 'true' : 'false'); });
@@ -181,13 +200,34 @@
     setTitleForView(i);
     requestAnimationFrame(syncCompactHeader);
     if (!switching) return;
+    if (lowPowerFrame && DATA) {
+      if (i === 0 && collageDirty && DATA.recent) renderCollageFromData(false);
+      if (i === 1 && DATA.stats) renderStatsContext(false);
+      if (i === 2 && atlasDirty && DATA.lifelist) renderAtlas(false);
+    }
     // Replay the view's entrance animation on switch (collage bloom,
     // stats left-to-right, atlas row-by-row).
     if (i === 0) playCollageEntrance();
     else if (i === 1) playStatsEntrance(STATS_LEAD);
     else if (i === 2) playAtlasEntrance(SWITCH_LEAD);
   }
-  btns.forEach(function (b) { b.addEventListener('click', function () { go(+b.dataset.i); }); });
+  btns.forEach(function (b) {
+    var lastTouch = 0;
+    b.addEventListener('touchstart', function (ev) {
+      // Select on touch-down and suppress the delayed compatibility click.
+      // That click is the one WebView may re-hit-test after the slide moves.
+      lastTouch = Date.now();
+      ev.preventDefault();
+      go(+b.dataset.i);
+    }, { passive: false });
+    b.addEventListener('click', function (ev) {
+      if (Date.now() - lastTouch < 800) {
+        ev.preventDefault();
+        return;
+      }
+      go(+b.dataset.i);
+    });
+  });
   // Paint the restored sheet immediately. Pre-seeding the title avoids the
   // normal cross-view title transition during the initial page load.
   if (staticTitle) staticTitle.textContent = titleForView(currentView);
@@ -741,12 +781,23 @@
   }
   function scopedFetchJson(action, params, request) {
     request = request || educatorScopeRequest();
+    var friendsAtRequest = newFriends && newFriends.checked;
+    var hoursAtRequest = currentHours;
+    if (newFriends) newFriends.disabled = currentHours >= 1000000 || !!educatorScopeId();
+    if (action === 'recent' && !request.scopeId && !educatorScopeId()) {
+      params = Object.assign({}, params);
+      if (params.hours === -1) { params.hours = 24; params.period = 'overnight'; }
+      if (friendsAtRequest && currentHours < 1000000) params.new_friends = 1;
+    }
     if (request.generation !== educatorScopeGeneration) {
       var obsolete = new Error('stale educator scope');
       obsolete.educatorStale = true;
       return Promise.reject(obsolete);
     }
     return fetchJson(birdApiUrl(action, params, request.scopeId)).then(function (payload) {
+      if (action === 'recent' && (hoursAtRequest !== currentHours || friendsAtRequest !== (newFriends && newFriends.checked))) {
+        throw new Error('stale bird filter');
+      }
       if (!adoptEducatorScope(payload, request.scopeId, request.generation)) {
         var stale = new Error('stale educator scope');
         stale.educatorStale = true;
@@ -880,7 +931,7 @@
   var sessionAtlasStyle = null;
   function atlasStyle() {
     if (sessionAtlasStyle !== null) return sessionAtlasStyle;
-    return readLS(ATLAS_STYLE_KEY, 'stamps') === 'classic' ? 'classic' : 'stamps';
+    return readLS(ATLAS_STYLE_KEY, lowPowerFrame ? 'classic' : 'stamps') === 'classic' ? 'classic' : 'stamps';
   }
   function atlasUsesClassicCards() {
     return atlasStyle() === 'classic';
@@ -1033,6 +1084,13 @@
   });
   var winBtns = [].slice.call(winPick.querySelectorAll('button'));
   var currentHours = +readLS('bird:window', '24') || 24;
+  var newFriends = document.getElementById('newFriends');
+  newFriends.checked = readLS('bird:newFriends', 'false') === 'true';
+  newFriends.title = 'Absent in the 10 days before this period (60 days for 7D)';
+  newFriends.addEventListener('change', function () {
+    writeLS('bird:newFriends', String(newFriends.checked));
+    refreshRecent(true); refreshStatsContext(true);
+  });
   winBtns.forEach(function (b) {
     b.setAttribute('aria-current', (+b.dataset.h === currentHours) ? 'true' : 'false');
   });
@@ -3111,7 +3169,39 @@
     collage.setAttribute('data-frame-token', DATA.recent.frame_capture_id);
   }
 
+  var frameLayoutIdentity = '', frameLayoutWeights = null;
   function renderCollage(items, animate) {
+    if (lowPowerFrame && currentView !== 0) { collageDirty = true; return; }
+    collageDirty = false;
+    var nextIdentity = '', nextWeights = null;
+    if (lowPowerFrame && !window.__avianFrameCapture && items.length && tablesReady && labelFontReady) {
+      nextIdentity = JSON.stringify([collage.clientWidth, collage.clientHeight, labelsOn(),
+        ACTIVE_BUNDLE.contentRevision, educatorScopeGeneration, currentHours,
+        items.map(function (s) { return [s.sci, s.com]; }).sort()]);
+      var exponent = tuning(items.length).countExp, totalWeight = 0, fresh = {};
+      nextWeights = {};
+      items.forEach(function (s) {
+        fresh[s.sci] = s;
+        nextWeights[s.sci] = Math.pow(Math.max(1, +s.n || 1), exponent);
+        totalWeight += nextWeights[s.sci];
+      });
+      Object.keys(nextWeights).forEach(function (sci) { nextWeights[sci] /= totalWeight; });
+      // Keep exact counts current, but don't solve the same expensive packing problem for
+      // tiny weight changes. New species, window/size/label changes always repack.
+      if (collagePlaced.length && nextIdentity === frameLayoutIdentity && frameLayoutWeights &&
+          Object.keys(nextWeights).every(function (sci) {
+            return Math.abs(nextWeights[sci] - frameLayoutWeights[sci]) < 0.025;
+          })) {
+        var period = educatorScopeId() ? 'in ' + educatorScopeLabel(effectiveEducatorScope) : windowLabel(currentHours, DATA.recent);
+        collagePlaced.forEach(function (tile) {
+          tile.data = fresh[tile.data.sci];
+          var n = +tile.data.n || 0;
+          tile.el.title = (tile.data.com || tile.data.sci) + ' - ' + fmtN(n) + ' ' + (n === 1 ? 'call' : 'calls') + ' ' + period;
+        });
+        finishFrameRender(items, collagePlaced.length);
+        return;
+      }
+    }
     collage.removeAttribute('data-frame-token');
     collage.setAttribute('data-frame-revision', ++collageRenderRevision);
     collage.innerHTML = '';
@@ -3351,6 +3441,13 @@
     // Stash the placed tiles so the alpha-mask hit-tester (below) can
     // resolve which silhouette the cursor is actually over.
     collagePlaced = placed.filter(function (t) { return t.x > -1000; });
+    if (nextIdentity && placed.length && collagePlaced.length === placed.length) {
+      frameLayoutIdentity = nextIdentity;
+      frameLayoutWeights = nextWeights;
+    } else {
+      frameLayoutIdentity = '';
+      frameLayoutWeights = null;
+    }
 
     // Bloom the birds in from the centre outward, but only when asked
     // (first load, window change, view switch) - never on the silent 30s
@@ -3365,6 +3462,7 @@
   // (e.g. switching back to the collage view).
   var collageEntranceT = null;
   function playCollageEntrance() {
+    if (lowPowerFrame) return;
     var tiles = [].slice.call(collage.querySelectorAll('.gtile'));
     if (!tiles.length) return;
     var cx = collage.clientWidth / 2, cy = collage.clientHeight / 2;
@@ -3403,6 +3501,7 @@
   // `backwards` fill keeps them hidden during the lead, so there's no flash.
   // In-place re-renders (sort change) pass no lead - they fire immediately.
   function playAtlasEntrance(lead) {
+    if (lowPowerFrame) return;
     lead = lead || 0;
     var grid = document.getElementById('atlasGrid');
     if (!grid) return;
@@ -3438,6 +3537,7 @@
   // hidden until the slide settles, then populates left-to-right; in-place
   // re-renders (window-picker change) pass no lead and animate immediately.
   function playStatsEntrance(lead) {
+    if (lowPowerFrame) return;
     lead = lead || 0;
     var plot = document.querySelector('.stats-tl-plot');
     if (!plot) return;
@@ -3536,6 +3636,7 @@
     if (tip) tip.setAttribute('aria-hidden', 'true');
   });
   collage.addEventListener('click', function (ev) {
+    if (Date.now() < suppressCollageTapUntil) return;
     var hit = maskHitTest(ev.clientX, ev.clientY);
     if (!hit) return;
     location.hash = '#sci=' + encodeURIComponent(hit.data.sci);
@@ -3606,6 +3707,7 @@
   // a bare "window" with the span it actually covers. Thresholds match
   // the winPick buttons (1H / 12H / 24H / 7D / ALL).
   function windowLabel(h, windowData) {
+    if (h === -1 || (windowData && windowData.overnight)) return 'overnight';
     if (windowData && windowData.midnight_clamped) return 'since midnight';
     if (h <= 1) return 'this hour';
     if (h <= 12) return 'past 12h';
@@ -3703,6 +3805,7 @@
   // rotated label (common + scientific name) sits at the column's
   // bottom, and each column carries its own timestamp on the x-axis.
   function drawHistograms(animate) {
+    if (lowPowerFrame && currentView !== 1) return;
     var tl = document.getElementById('statsTimeline');
     if (!tl) return;
     var all = ((DATA.statsRecent && DATA.statsRecent.species) || []).slice();
@@ -3846,6 +3949,7 @@
 
   // ---- Side text lists (real Pi data) ----
   function renderStatsLists() {
+    if (lowPowerFrame && currentView !== 1) return;
     var stats = DATA.stats || {};
     var recent = DATA.statsRecent || { species: [] };
     var firstseen = DATA.firstseen || { species: [] };
@@ -4067,6 +4171,7 @@
     st.els.rx = ov.querySelector('.rh-xh-rx'); st.els.ry = ov.querySelector('.rh-xh-ry');
   }
   function renderRhythm() {
+    if (lowPowerFrame && currentView !== 1) return;
     var host = document.getElementById('statsRhythm');
     if (!host) return;
     var r = DATA.rhythm;
@@ -4333,6 +4438,7 @@
     });
   }
   function renderHourly() {
+    if (lowPowerFrame && currentView !== 1) return;
     var wrap = document.getElementById('heatmapWrap');
     if (!wrap) return;
     var d = DATA.hourly;
@@ -5666,6 +5772,8 @@
   }
 
   function renderAtlas(animate) {
+    if (lowPowerFrame && currentView !== 2) { atlasDirty = true; return; }
+    atlasDirty = false;
     var grid = document.getElementById('atlasGrid');
     if (!grid) return;
     stopAtlasCardAudio();
@@ -6025,6 +6133,7 @@
     function tolerate(fetching) {
       return transactional ? fetching : fetching.catch(function () { return null; });
     }
+    var recentPainted = false;
     var recent = scopedFetchJson('recent', { hours: forHours }, request).then(function (data) {
       if (!data || !Array.isArray(data.species)) throw new Error('invalid recent detections');
       if (!window.__avianFrameCapture && !transactional && request.generation === educatorScopeGeneration
@@ -6032,6 +6141,7 @@
         DATA.recent = data;
         if (typeof data.site_name === 'string') applySiteName(data.site_name);
         renderCollageFromData(animate);
+        recentPainted = true;
       }
       return data;
     });
@@ -6076,7 +6186,7 @@
       renderTimeIndependent(animate);
       renderHourly();
       updateStatsDateNav();
-      renderCollageFromData(animate);
+      if (!lowPowerFrame || !recentPainted) renderCollageFromData(animate);
       if (transactional) {
         if (typeof clearEducatorScopeFailure === 'function') clearEducatorScopeFailure(request);
         setEducatorDataLoading(false);

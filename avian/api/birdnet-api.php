@@ -364,6 +364,22 @@ switch ($action) {
         );
         $where = $window['where'];
         $bind = $window['bind'];
+        $overnight = $educatorScope === null && ($_GET['period'] ?? '') === 'overnight';
+        $newFriends = $educatorScope === null && ($_GET['new_friends'] ?? '') === '1' && ($overnight || $hours <= 168);
+        if ($overnight) {
+            require_once __DIR__ . '/view-period.php';
+            $period = viewPeriod(24, true, new DateTimeImmutable($ctx['anchor'], new DateTimeZone('America/Los_Angeles')));
+            $window['window_start'] = $period['start'];
+            $window['midnight_clamped'] = false;
+            $where = "DATETIME(Date||' '||Time) >= :window_start AND DATETIME(Date||' '||Time) <= :anchor";
+            $bind = [':window_start' => $period['start'], ':anchor' => $period['end']];
+        }
+        if ($newFriends) {
+            $days = $hours === 168 ? 60 : 10;
+            $where .= " AND Sci_Name NOT IN (SELECT Sci_Name FROM detections WHERE Sci_Name IS NOT NULL AND "
+                . "DATETIME(Date||' '||Time) >= DATETIME(:window_start, '-$days days') "
+                . "AND DATETIME(Date||' '||Time) < DATETIME(:window_start))";
+        }
         // species-collapsed view: one row per species seen in the window,
         // with the file of its highest-confidence detection inside the window.
         $rs = rows($db,
@@ -394,6 +410,7 @@ switch ($action) {
             'reset_at_midnight' => $window['reset_at_midnight'],
             'midnight_clamped' => $window['midnight_clamped'],
             'window_start' => $window['window_start'],
+            'overnight' => $overnight, 'new_friends' => $newFriends,
             'species' => $rs, 'site_name' => publicSiteName($CONF_PATH), 'as_of' => date('c')
         ]);
         break;

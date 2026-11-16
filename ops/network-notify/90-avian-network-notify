@@ -1,0 +1,10 @@
+#!/bin/sh
+# NetworkManager dispatcher: run asynchronously so association and DHCP are
+# never delayed by a WhatsApp delivery attempt.
+case "$1:$2" in
+    wlan0:up|wlan0:dhcp4-change)
+        /usr/bin/systemd-run --quiet --collect \
+          --unit="avian-network-notify-$(date +%s%N)" \
+          /usr/local/lib/avianvisitors/avian-network-notify.py
+        ;;
+esac

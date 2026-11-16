@@ -58,6 +58,8 @@
     overflow: hidden;
   }
   .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.02em; }
+  .new-friends { position: fixed; bottom: 7px; left: 50%; transform: translateX(-50%); z-index: 30; font: 12px ui-monospace, monospace; color: var(--ink-2); cursor: pointer; }
+  .new-friends input { accent-color: var(--ink); }
 
   /* ============ Stage / views ============
      Stage is a flex column: a static title block sits on top, the views
