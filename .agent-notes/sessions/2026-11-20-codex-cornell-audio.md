@@ -24,3 +24,18 @@
 - Pi display refreshed; BirdNET recording, analysis, Caddy and display active.
 - Code committed/pushed on frame-views-sync; Pi uses the same branch/revision.
 - Existing untracked PROJECT-HANDOFF.md and Pi model/labels_flickr.txt retained.
+
+## Song/call follow-up and tailnet fix
+
+- User requested separate song/call examples and classification per local
+  recording, then reported all examples unavailable.
+- Reproduced a 403 from direct Tailscale access while loopback worked. Added
+  an audio-endpoint-only direct tailnet gate with address/host checks and
+  rejection of extra forwarding headers; unchanged global admin gates.
+- Reimported 908 species: 549 song, 890 call, 132 other examples. Mixed and
+  mechanical tracks are never mislabeled as pure song/call. Files verified.
+- Species API now explicitly reports null vocalization_type/unclassified;
+  UI shows that status per recording. Automatic inference is NOT installed.
+  Discovered EMSN-Nijverdal/emsn-vocalization targets 232 Dutch species and
+  is not validated for Oregon. Further model evaluation/training remains.
+- Separate-example deployment/live playback verification in progress.
