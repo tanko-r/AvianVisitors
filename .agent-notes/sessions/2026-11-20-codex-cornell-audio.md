@@ -17,4 +17,10 @@
 - Caddy requires explicit publication: added only the two new APIs and three
   helper assets to scripts/update_caddyfile.sh and validated/reloaded config.
 - Verified syntax, 405 on suggestion GET, 403 on forwarded audio requests.
-- Audio transfer/playback verification in progress; final results below.
+- Installed all 908 examples root:caddy 0640 under the dedicated library.
+- Live Chromium test confirmed MP3 decoding and advancing playback time,
+  reference/local recording mutual exclusion, and stop on species-box close.
+- Byte-range smoke test returned 206 and exactly 64 requested bytes.
+- Pi display refreshed; BirdNET recording, analysis, Caddy and display active.
+- Code committed/pushed on frame-views-sync; Pi uses the same branch/revision.
+- Existing untracked PROJECT-HANDOFF.md and Pi model/labels_flickr.txt retained.
