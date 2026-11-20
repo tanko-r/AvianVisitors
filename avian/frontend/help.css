@@ -1,0 +1,34 @@
+.help-button {
+  position: fixed; left: 18px; bottom: 18px; z-index: 35;
+  width: 36px; height: 36px; border: 0; border-radius: 50%;
+  background: var(--paper); color: var(--ink); box-shadow: var(--raised);
+  font: 18px/1 ui-serif, Georgia, serif; cursor: pointer;
+}
+.help-dialog {
+  box-sizing: border-box; width: min(480px, calc(100vw - 32px));
+  max-height: calc(100vh - 40px); overflow: auto; overscroll-behavior: contain;
+  padding: 30px; border: 0; border-radius: 14px;
+  background: var(--paper); color: var(--ink);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, .25);
+  font: 15px/1.5 ui-serif, Georgia, serif;
+}
+.help-dialog::backdrop { background: rgba(0, 0, 0, .4); }
+.help-dialog h2 { margin: 0 28px 18px 0; font-size: 26px; }
+.help-dialog p { margin: 12px 0; }
+.help-dialog form { margin-top: 22px; border-top: 1px solid var(--ink-soft); padding-top: 18px; }
+.help-dialog label { display: block; }
+.help-dialog textarea {
+  display: block; box-sizing: border-box; width: 100%; margin: 10px 0;
+  padding: 10px; resize: vertical; border: 1px solid var(--ink-soft);
+  border-radius: 8px; background: var(--paper-2); color: var(--ink); font: inherit;
+}
+.suggestion-send {
+  border: 0; padding: 10px 16px; border-radius: 999px; cursor: pointer;
+  background: var(--paper); color: var(--ink); box-shadow: var(--raised);
+  font: 10px/1 ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase;
+}
+.suggestion-send:disabled { opacity: .5; cursor: wait; }
+#suggestionStatus { font-size: 13px; min-height: 1.5em; }
+.typical-birdsong-caption { display: block; margin-top: 8px; color: var(--ink-soft); font: 10px/1.4 ui-monospace, monospace; }
+#typicalBirdsong { margin-top: 12px; }
+#typicalBirdsong[aria-pressed="true"] { box-shadow: var(--recess); background: var(--paper-2); }

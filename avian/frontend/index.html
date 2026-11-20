@@ -271,6 +271,8 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
         <div class="postcard-heading">
           <h2 id="modalCommon">-</h2>
           <span id="modalSci" hidden></span>
+          <button type="button" class="suggestion-send" id="typicalBirdsong" aria-pressed="false" disabled>Typical Birdsong</button>
+          <small id="typicalBirdsongCaption" class="typical-birdsong-caption"></small>
           <div class="postcard-stats" aria-label="Bird history">
             <span><b id="modalAllTime">-</b> heard</span>
             <span><b id="modalFirstSeen">-</b> first heard</span>
@@ -401,6 +403,25 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <script src="./stamp-batch-b.js?v=r318"></script>
 <script src="./stamp-batch-c.js?v=r235"></script>
 <script src="./bundle-ui.js?v=r11"></script>
-<script src="./apt.js?v=frame-20261116-4"></script>
+<script src="./apt.js?v=frame-20261120-1"></script>
+<script src="./avian/frontend/typical-birdsong.js?v=1"></script>
+<button type="button" id="helpButton" class="help-button" aria-label="Help and suggestions" aria-haspopup="dialog">?</button>
+<dialog id="helpDialog" class="help-dialog" aria-labelledby="helpTitle">
+  <button type="button" id="helpClose" class="modal-close" aria-label="Close help">×</button>
+  <h2 id="helpTitle">Your bird guide</h2>
+  <p>Choose a time window at the top to see which birds visited. Overnight covers one hour after sunset until one hour before sunrise in Grants Pass.</p>
+  <p><strong>Collage</strong> shows your visitors. Tap a bird to learn about it and listen to recordings. Close its box to return to your view.</p>
+  <p><strong>Typical Birdsong</strong> plays a Cornell reference song or call. The recordings in the bird’s box are sounds actually heard here.</p>
+  <p><strong>Stats</strong> shows activity over time. <strong>Atlas</strong> lets you browse and sort the birds.</p>
+  <p><strong>New Friends</strong> shows birds heard in your chosen period but absent in the preceding 10 days, or 60 days for the 7-day window.</p>
+  <form id="suggestionForm">
+    <label for="suggestionText">Have an idea or something that isn’t working?</label>
+    <textarea id="suggestionText" name="suggestion" rows="3" maxlength="2000" required placeholder="What would make this better?"></textarea>
+    <button type="submit" class="suggestion-send">Send suggestion</button>
+    <p id="suggestionStatus" role="status" aria-live="polite"></p>
+  </form>
+</dialog>
+<link rel="stylesheet" href="./avian/frontend/help.css?v=1">
+<script src="./avian/frontend/help.js?v=1"></script>
 </body>
 </html>

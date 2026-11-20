@@ -14159,6 +14159,7 @@
   }
 
   function playModalRecording(row) {
+    document.dispatchEvent(new Event('avian-recording-play'));
     var button = row && row.querySelector('.rec-player-toggle');
     if (!button || button.disabled) return;
     setRecordingExpanded(row, true);
@@ -14287,6 +14288,7 @@
   }
 
   var modalRecordings = document.getElementById('modalRecordings');
+  document.addEventListener('avian-typical-play', stopModalAudio);
   modalRecordings.addEventListener('click', function (ev) {
     if (!ev.target.closest) return;
     var play = ev.target.closest('.rec-player-toggle');
