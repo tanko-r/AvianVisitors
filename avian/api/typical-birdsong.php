@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/admin-auth.php';
-header('Cache-Control: private, max-age=3600');
+header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 if (!avian_is_direct_local_request($_SERVER)) avian_api_fail(403, 'home-network access required');
 if (!in_array($_SERVER['REQUEST_METHOD'] ?? '', ['GET', 'HEAD'], true)) avian_api_fail(405, 'GET required');
@@ -32,6 +32,7 @@ if (isset($_SERVER['HTTP_RANGE'])) {
     header("Content-Range: bytes $start-$end/$size");
 }
 header('Content-Type: audio/mpeg');
+header('Cache-Control: private, max-age=3600');
 header('Accept-Ranges: bytes');
 header('Content-Length: ' . ($end - $start + 1));
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'HEAD') exit;
