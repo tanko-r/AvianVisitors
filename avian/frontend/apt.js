@@ -9832,6 +9832,7 @@
             + '<span class="when"><b>' + fmtRecTime(d.d, d.t) + '</b></span>'
             + '<span class="conf"><b>' + ((+d.conf || 0) * 100).toFixed(0) + '%</b></span>'
             + '<span class="date-time"><b>' + fmtDateLine(d.d, d.t) + '</b></span>'
+            + '<span class="rec-vocalization" title="BirdNET identifies the species; no song/call classifier is installed">Song/call: unclassified</span>'
             + '</button>'
             + '<div class="rec-spectro" aria-hidden="true">'
             + '<div class="rec-spectro-loading">loading spectrogram...</div>'

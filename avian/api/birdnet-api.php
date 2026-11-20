@@ -437,7 +437,13 @@ switch ($action) {
         birdnetRespond($db, $educatorScope, [
             'sci' => $sci,
             'summary' => $summary,
-            'detections' => $detections,
+            // BirdNET's confidence concerns species, not vocalization type.
+            // Preserve an explicit unknown until a validated classifier exists.
+            'detections' => array_map(static function ($d) {
+                $d['vocalization_type'] = null;
+                $d['vocalization_status'] = 'unclassified';
+                return $d;
+            }, $detections),
             'page' => ['limit' => $limit, 'offset' => $offset, 'returned' => count($detections)],
         ]);
         break;

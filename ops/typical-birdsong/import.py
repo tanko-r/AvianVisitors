@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import one unmodified Cornell MP3 per species into a private library."""
+"""Import separate Cornell song and call examples, without relabeling sounds."""
 import argparse
 import hashlib
 import json
@@ -24,14 +24,19 @@ with zipfile.ZipFile(args.archive) as archive:
             continue
         common, number, label = match.groups()
         key = re.sub('[^a-z0-9]', '', common.lower())
-        rank = ('song' not in label.lower(), int(number), name)
-        if key not in chosen or rank < chosen[key][0]:
-            chosen[key] = (rank, entry, common, label)
+        # Mixed song-and-call tracks are not pure examples of either type.
+        song = bool(re.search(r'\bsongs?\b', label, re.I))
+        call = bool(re.search(r'\bcalls?\b', label, re.I))
+        kind = 'song' if song and not call else 'call' if call and not song else 'other'
+        rank = (int(number), name)
+        pair = (key, kind)
+        if pair not in chosen or rank < chosen[pair][0]:
+            chosen[pair] = (rank, entry, common, label)
     manifest = {}
-    for key, (_, entry, common, label) in sorted(chosen.items()):
-        filename = hashlib.sha256(key.encode()).hexdigest()[:24] + '.mp3'
+    for (key, kind), (_, entry, common, label) in sorted(chosen.items()):
+        filename = hashlib.sha256((key + ':' + kind).encode()).hexdigest()[:24] + '.mp3'
         (dest / filename).write_bytes(archive.read(entry))
-        manifest[key] = dict(file=filename, common=common, description=label,
-                             source='Cornell Guide to Bird Sounds (v2025)')
+        manifest.setdefault(key, {})[kind] = dict(file=filename, common=common, description=label,
+                             type=kind, source='Cornell Guide to Bird Sounds (v2025)')
     (dest / 'index.json').write_text(json.dumps(manifest, ensure_ascii=False), encoding='utf-8')
-print(f'Imported {len(manifest)} species; songs preferred, calls used otherwise.')
+print(f'Imported {len(manifest)} species: ' + ', '.join(f'{sum(kind in tracks for tracks in manifest.values())} {kind}' for kind in ('song', 'call', 'other')))
