@@ -43,3 +43,14 @@
   both American Robin examples with advancing audio time and showed local
   recording status as Song/call: unclassified. Forwarded header rejected 403.
 - Display refreshed; existing midnight-reset tests passed, core services active.
+
+## Cloudflare follow-up
+
+- User clarified access is via Cloudflare, not Tailscale. Reproduced 403 at
+  birdnet.rigid-dreamy-sweep.us. Public/proxied reference audio now requires
+  the existing menu admin session instead of rejecting every proxy request.
+  Purchased media remains unavailable anonymously; no new auth secrets.
+- Song/call buttons grouped in one non-wrapping flex row; version URLs bumped.
+- A 401 explains remote unlock and opens the existing menu after dismissing
+  the species dialog; successful menu unlock refreshes reference availability.
+- Deployment and authenticated Cloudflare playback tests in progress.

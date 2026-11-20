@@ -7640,6 +7640,7 @@
   function renderMenu(menu, auth) {
     adminUnlockProbeGeneration += 1;
     adminAccessState = 'unlocked';
+    document.dispatchEvent(new Event('avian-reference-auth-change'));
     adminAuthMeta = normalizeAdminAuthMeta(auth);
     adminLastActivityAt = sharedAdminActivity() || Date.now();
     scheduleAdminIdleLock();

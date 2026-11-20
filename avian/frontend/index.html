@@ -271,8 +271,10 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
         <div class="postcard-heading">
           <h2 id="modalCommon">-</h2>
           <span id="modalSci" hidden></span>
-          <button type="button" class="suggestion-send" id="typicalBirdsong" aria-pressed="false" disabled>Typical Song</button>
-          <button type="button" class="suggestion-send" id="typicalBirdcall" aria-pressed="false" disabled>Typical Call</button>
+          <div class="typical-audio-buttons" role="group" aria-label="Reference sounds">
+            <button type="button" class="suggestion-send" id="typicalBirdsong" aria-pressed="false" disabled>Typical Song</button>
+            <button type="button" class="suggestion-send" id="typicalBirdcall" aria-pressed="false" disabled>Typical Call</button>
+          </div>
           <small id="typicalBirdsongCaption" class="typical-birdsong-caption"></small>
           <div class="postcard-stats" aria-label="Bird history">
             <span><b id="modalAllTime">-</b> heard</span>
@@ -404,8 +406,8 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <script src="./stamp-batch-b.js?v=r318"></script>
 <script src="./stamp-batch-c.js?v=r235"></script>
 <script src="./bundle-ui.js?v=r11"></script>
-<script src="./apt.js?v=frame-20261120-2"></script>
-<script src="./avian/frontend/typical-birdsong.js?v=2"></script>
+<script src="./apt.js?v=frame-20261120-3"></script>
+<script src="./avian/frontend/typical-birdsong.js?v=3"></script>
 <button type="button" id="helpButton" class="help-button" aria-label="Help and suggestions" aria-haspopup="dialog">?</button>
 <dialog id="helpDialog" class="help-dialog" aria-labelledby="helpTitle">
   <button type="button" id="helpClose" class="modal-close" aria-label="Close help">×</button>
@@ -422,7 +424,7 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
     <p id="suggestionStatus" role="status" aria-live="polite"></p>
   </form>
 </dialog>
-<link rel="stylesheet" href="./avian/frontend/help.css?v=2">
+<link rel="stylesheet" href="./avian/frontend/help.css?v=3">
 <script src="./avian/frontend/help.js?v=1"></script>
 </body>
 </html>

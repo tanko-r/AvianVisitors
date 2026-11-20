@@ -13,6 +13,9 @@ Deploy the generated MP3s and index.json to
 `/var/lib/avian-visitors/typical-birdsong/`, owner root, group caddy, directory
 0750, files 0640. The API serves only indexed files to direct local clients,
 supports byte ranges for seeking, and never accepts a filesystem path.
+Direct tailnet requests are also accepted. Cloudflare/public requests require
+the existing admin menu session; neither proxy headers nor a public hostname
+are treated as proof of permission. Remote audio responses are not cached.
 The audio is personal-use material, not a public application asset.
 
 Help suggestions are separate runtime data, provisioned using

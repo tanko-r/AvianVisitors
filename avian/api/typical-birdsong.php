@@ -22,7 +22,7 @@ function reference_tailnet_request(array $server): bool {
     }
     return !avian_has_forwarding_headers($server);
 }
-if (!avian_is_direct_local_request($_SERVER) && !reference_tailnet_request($_SERVER)) avian_api_fail(403, 'home-network or direct Tailscale access required');
+if (!avian_is_direct_local_request($_SERVER) && !reference_tailnet_request($_SERVER)) avian_require_admin_proof();
 if (!in_array($_SERVER['REQUEST_METHOD'] ?? '', ['GET', 'HEAD'], true)) avian_api_fail(405, 'GET required');
 $name = $_GET['name'] ?? '';
 if (!is_string($name) || strlen($name) > 200) avian_api_fail(400, 'invalid species');
@@ -57,7 +57,8 @@ if (isset($_SERVER['HTTP_RANGE'])) {
     header("Content-Range: bytes $start-$end/$size");
 }
 header('Content-Type: audio/mpeg');
-header('Cache-Control: private, max-age=3600');
+// Session-protected reference audio must not survive logout in a shared cache.
+header('Cache-Control: private, no-store');
 header('Accept-Ranges: bytes');
 header('Content-Length: ' . ($end - $start + 1));
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'HEAD') exit;

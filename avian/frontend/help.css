@@ -30,8 +30,8 @@
 .suggestion-send:disabled { opacity: .5; cursor: wait; }
 #suggestionStatus { font-size: 13px; min-height: 1.5em; }
 .typical-birdsong-caption { display: block; margin-top: 8px; color: var(--ink-soft); font: 10px/1.4 ui-monospace, monospace; }
-#typicalBirdsong { margin-top: 12px; }
-#typicalBirdcall { margin-top: 12px; }
+.typical-audio-buttons { display: flex; flex-flow: row nowrap; gap: 8px; margin-top: 12px; width: 100%; }
+.typical-audio-buttons .suggestion-send { flex: 1 1 0; min-width: 0; padding: 10px 8px; font-size: clamp(8px, 1.3vw, 10px); letter-spacing: .04em; white-space: nowrap; }
 #typicalBirdcall[aria-pressed="true"] { box-shadow: var(--recess); background: var(--paper-2); }
 .rec-vocalization { display: block; font: 10px/1.5 ui-monospace, monospace; color: var(--ink-soft); grid-column: 1 / -1; }
 #typicalBirdsong[aria-pressed="true"] { box-shadow: var(--recess); background: var(--paper-2); }
