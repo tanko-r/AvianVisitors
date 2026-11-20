@@ -53,4 +53,10 @@
 - Song/call buttons grouped in one non-wrapping flex row; version URLs bumped.
 - A 401 explains remote unlock and opens the existing menu after dismissing
   the species dialog; successful menu unlock refreshes reference availability.
-- Deployment and authenticated Cloudflare playback tests in progress.
+- Verified real Cloudflare HTTPS login, metadata, and song/call byte ranges
+  (206 / 64 bytes). Logout returns 401. Test session cookies stayed in memory;
+  credentials were neither printed nor copied. Initial Python default UA was
+  rejected by Cloudflare; a browser UA passed. No access policy weakened.
+- Live Cloudflare browser checks at 1280 and 390 px confirmed same-row,
+  non-overlapping buttons, accurate unlock guidance, and visible login after
+  tapping a reference button while signed out. Pi refreshed and synced.
