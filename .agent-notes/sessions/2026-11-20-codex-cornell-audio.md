@@ -38,4 +38,8 @@
   UI shows that status per recording. Automatic inference is NOT installed.
   Discovered EMSN-Nijverdal/emsn-vocalization targets 232 Dutch species and
   is not validated for Oregon. Further model evaluation/training remains.
-- Separate-example deployment/live playback verification in progress.
+- Separate library installed and verified: direct Tailscale song and call
+  requests return 206 for byte ranges. Live Chromium at 100.88.155.15 played
+  both American Robin examples with advancing audio time and showed local
+  recording status as Song/call: unclassified. Forwarded header rejected 403.
+- Display refreshed; existing midnight-reset tests passed, core services active.
