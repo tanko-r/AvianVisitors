@@ -13760,7 +13760,9 @@
   function getSpecCtx() {
     if (!_specAudioCtx) {
       var C = window.AudioContext || window.webkitAudioContext;
-      if (C) _specAudioCtx = new C();
+      if (C) {
+        try { _specAudioCtx = new C(); } catch (error) { return null; }
+      }
     }
     return _specAudioCtx;
   }
@@ -14025,6 +14027,7 @@
       if (loadingEl) loadingEl.style.display = 'none';
       return;
     }
+    if (strip.querySelector('.rec-spectro-image')) return; // image still loading
     if (canvas && canvas.classList.contains('ready')) {
       if (loadingEl) loadingEl.style.display = 'none';
       return;
@@ -14057,7 +14060,10 @@
           if (!response.ok) throw new Error('HTTP ' + response.status);
           return response.arrayBuffer();
         })
-        .then(function (buffer) { return ctx.decodeAudioData(buffer); })
+        .then(function (buffer) {
+          // Older Android WebAudio implementations only support callbacks.
+          return new Promise(function (resolve, reject) { ctx.decodeAudioData(buffer, resolve, reject); });
+        })
         .then(function (audioBuffer) {
           _decodedCache[cacheKey] = audioBuffer;
           return audioBuffer;
@@ -14117,6 +14123,21 @@
       });
     }
 
+    if (lowPowerFrame || /Android/i.test(navigator.userAgent)) {
+      // BirdNET already generated this exact clip's PNG on the Pi. Avoid
+      // decoding audio and running an FFT on the Android recovery dashboard.
+      var stored = new Image();
+      stored.className = 'rec-spectro-image';
+      stored.alt = 'Spectrogram of this recording';
+      stored.onload = function () { stored.classList.add('ready'); done(); };
+      stored.onerror = function () {
+        stored.remove();
+        fail('Spectrogram unavailable for this recording.');
+      };
+      strip.insertBefore(stored, strip.firstChild);
+      stored.src = mediaApiUrl('spectrogram', { file: file, detection: detection }, rowScope);
+      return;
+    }
     if (_decodedCache[mediaCacheKey]) {
       paintSpectrogram(canvas, _decodedCache[mediaCacheKey]);
       done();
