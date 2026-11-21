@@ -13,4 +13,10 @@
   Guarded AudioContext construction and callback-only decodeAudioData support.
 - Verified latest Robin PNG endpoint returns 200/image/png. No device-side
   changes or widened network maintenance access. Screen schedule still pending.
-- Deployment and browser regression verification in progress.
+- Deployed and verified in live Chromium: lite profile loads an IMG with
+  naturalWidth 940 and hides the loading text; full profile paints a ready
+  CANVAS width 472. Help sits 18 px from right and bottom in both profiles.
+- Refreshed Pi display; core services active. Still no VNC connection after
+  user-reported frame reboot; do not represent browser emulation as a test on
+  physical hardware. Frame local dashboard needs Reload dashboard to load
+  current assets. Restoring true AVNC mode remains unresolved.
