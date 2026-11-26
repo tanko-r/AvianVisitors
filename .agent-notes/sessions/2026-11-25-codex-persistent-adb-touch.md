@@ -101,4 +101,9 @@
   one switch per burst, vertical scrolling unaffected, modal exclusions retained.
   Removed visible edge arrows/background/border while retaining target dimensions,
   labels and keyboard-focus outline. Updated help instructions and asset versions.
-- Physical-path injected swipe verification pending deployment below.
+- Deployed and tested Android-injected gestures through actual AVNC→VNC→Pi:
+  left swipe changed Collage→Stats exactly once; right swipe returned to Collage.
+  Invisible right-edge tap opened Stats; vertical swipe scrolled its content
+  while staying in Stats. Invisible left edge returned to Collage. Screenshots
+  confirm no arrow/background targets visible. No AVNC profile changes needed.
+  JavaScript syntax and diff checks passed; source pushed and Pi pulled forward.

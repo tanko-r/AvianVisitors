@@ -6,6 +6,13 @@ after Wi-Fi works; the frame uses its original wall adapter.
 
 ## Components
 
+The app accepts horizontal wheel bursts as view swipes because AVNC touchscreen
+mode forwards its configured `gesture_swipe1=remote-scroll` this way. Pointer-only
+swipe tests do not exercise the frame path. Keep vertical scrolling enabled;
+one horizontal burst advances one view. Side navigation targets are invisible
+but tappable halfway down either edge. Android-injected left/right swipes and
+edge taps were verified through the live frame on 2026-11-25.
+
 - `com.avianvisitors.display` (Bird display), min SDK 23 / target 28, is an
   opt-in companion. It retains Home HQ as Android Home and leaves the vendor
   launcher unchanged. Build on the Windows development host with `build.ps1`
