@@ -44,6 +44,7 @@
   });
   document.getElementById('helpClose').addEventListener('click', function () { dialog.close(); });
   dialog.addEventListener('click', function (event) {
+    if (event.target !== dialog) return;
     var r = dialog.getBoundingClientRect();
     if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) {
       event.stopPropagation(); dialog.close();
