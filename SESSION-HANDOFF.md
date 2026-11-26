@@ -113,10 +113,11 @@ Use [BACKUP-RESTORE.md](BACKUP-RESTORE.md) for restoration and
    checks do not complete the requested physical spare-card shipping test.
 2. Test both Pi/frame cold-start orders on wall power with the development PC
    disconnected, including frame-speaker audio and reconnection.
-3. At the next frame maintenance session, remind David to deploy and physically
-   test the **10:30 PM screen sleep / 5:30 AM wake** schedule. Scripts are prepared
-   but not installed/verified. Check local timezone and reboot persistence through
-   approved ADB recovery before marking this complete.
+3. The **10:30 PM sleep / 5:30 AM wake** schedule was installed on 2026-11-26.
+   The frame clock uses America/Los_Angeles, the schedule process restarted after
+   reboot, and Android reported panel OFF and ON for manual sleep and wake events.
+   Physical visual confirmation and observation of both scheduled transitions
+   remain outstanding; do not mark the schedule fully verified.
 4. Complete recipient-network testing, physical Android Settings access,
    Tailscale expiry review, final location confirmation and the outstanding
    network-notification verification described in PROJECT-HANDOFF.md. The
