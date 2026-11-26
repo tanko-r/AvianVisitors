@@ -79,3 +79,4 @@ requirements_custom.txt
 
 # Purchased personal-use Cornell audio; never publish with source.
 avian/assets/*Cornell*.zip
+ops/frame-adb/build/

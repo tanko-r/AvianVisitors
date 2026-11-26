@@ -291,6 +291,20 @@
     pointer-events: none; z-index: 0;
   }
 
+  /* Strong physical-display contrast: a white active tab on a dark track. */
+  #winPick, #slider, .atlas-sort, .theme-pick, .labels-pick {
+    background: #49443e; --pill: #ffffff;
+  }
+  #winPick button, #slider button, .atlas-sort button { color: #eeeae4; }
+  #winPick button[aria-current="true"], #slider button[aria-current="true"],
+  .atlas-sort button[aria-current="true"] { color: #171411; }
+  #winPick button:hover, #slider button:hover { color: #ffffff; }
+  #winPick button[aria-current="true"]:hover, #slider button[aria-current="true"]:hover { color: #171411; }
+  #newFriends { background: #49443e; color: #ffffff; }
+  #newFriends[aria-pressed="true"] { background: #ffffff; color: #171411; outline: 2px solid #49443e; }
+  .frame-lite .slider button { min-height: 44px; padding: 11px 26px; }
+  .frame-lite .window-pick button { min-height: 36px; }
+
   /* ============ Menu dropdown ============ */
   /* ============ Menu - the button IS the card ============
      One shell, fixed to the top-right corner, is the whole control: a

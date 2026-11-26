@@ -14,7 +14,7 @@
 function systemTheme(){try{return window.matchMedia&&window.matchMedia(q).matches?'dark':'light';}catch(e){return'light';}}
 function preference(){try{var v=localStorage.getItem('bird:theme:v2');if(v==='auto'||v==='light'||v==='dark')return v;var old=localStorage.getItem('bird:theme');return old==='light'||old==='dark'?old:'auto';}catch(e){return'auto';}}
 var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemTheme());})();</script>
-  <link rel="stylesheet" href="./styles.css?v=frame-20261116-4">
+  <link rel="stylesheet" href="./styles.css?v=frame-20261125-2">
   <link rel="stylesheet" href="./bundles.css?v=r3">
   <link rel="stylesheet" href="./stamps.css?v=r355">
   <link rel="stylesheet" href="./stamp-batch-root.css?v=r254">
@@ -406,7 +406,7 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <script src="./stamp-batch-b.js?v=r318"></script>
 <script src="./stamp-batch-c.js?v=r235"></script>
 <script src="./bundle-ui.js?v=r11"></script>
-<script src="./apt.js?v=frame-20261121-1"></script>
+<script src="./apt.js?v=frame-20261125-2"></script>
 <script src="./avian/frontend/typical-birdsong.js?v=3"></script>
 <button type="button" id="helpButton" class="help-button" aria-label="Help and suggestions" aria-haspopup="dialog">?</button>
 <dialog id="helpDialog" class="help-dialog" aria-labelledby="helpTitle">
@@ -417,6 +417,8 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <p><strong>Typical Song</strong> and <strong>Typical Call</strong> play separate Cornell examples when available. Songs often serve courtship or territory; calls can signal contact, alarm, and other messages. Local recordings are currently marked unclassified because BirdNET identifies species, not song versus call.</p>
   <p><strong>Stats</strong> shows activity over time. <strong>Atlas</strong> lets you browse and sort the birds.</p>
   <p><strong>New Friends</strong> shows birds heard in your chosen period but absent in the preceding 10 days, or 60 days for the 7-day window.</p>
+  <button type="button" class="suggestion-send" id="touchTestStart">Test touch alignment</button>
+  <p>Tap five targets to measure where the frame reports your touches. This measures alignment; it does not change calibration.</p>
   <form id="suggestionForm">
     <label for="suggestionText">Have an idea or something that isn’t working?</label>
     <textarea id="suggestionText" name="suggestion" rows="3" maxlength="2000" required placeholder="What would make this better?"></textarea>
@@ -424,7 +426,12 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
     <p id="suggestionStatus" role="status" aria-live="polite"></p>
   </form>
 </dialog>
-<link rel="stylesheet" href="./avian/frontend/help.css?v=4">
-<script src="./avian/frontend/help.js?v=1"></script>
+<dialog id="touchTest" class="touch-test" aria-label="Touch alignment test">
+  <button type="button" id="touchTestClose" class="suggestion-send">Close test</button>
+  <div class="touch-test-note" id="touchTestNote"></div>
+  <div class="touch-target" id="touchTarget" aria-hidden="true">+</div>
+</dialog>
+<link rel="stylesheet" href="./avian/frontend/help.css?v=6">
+<script src="./avian/frontend/help.js?v=3"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@
     (performanceMode !== 'full' && /Android 6\.0.*AEEZO/.test(navigator.userAgent));
   var collageDirty = false, atlasDirty = false;
   if (lowPowerFrame) {
+    document.documentElement.classList.add('frame-lite');
     var performanceStyle = document.createElement('style');
     performanceStyle.id = 'avian-low-power';
     performanceStyle.textContent = '*{filter:none!important;backdrop-filter:none!important;' +
@@ -168,7 +169,7 @@
   // begins just as the view arrives - no dead pause, still snappy. Collage's
   // bloom reads fine mid-slide, so it starts immediately (no lead). Stats
   // reads as starting a hair slower than atlas, so it gets a shorter lead.
-  var SLIDE_MS = 480;
+  var SLIDE_MS = lowPowerFrame ? 0 : 480;
   var SWITCH_LEAD = SLIDE_MS - 100;   // atlas
   var STATS_LEAD = SLIDE_MS - 200;    // stats - begin a touch sooner
   var VIEW_STORAGE_KEY = 'bird:view';
@@ -202,13 +203,14 @@
     [].forEach.call(views.querySelectorAll('.view'), function (pane, index) {
       pane.inert = index !== i;
       pane.setAttribute('aria-hidden', String(index !== i));
+      if (lowPowerFrame) pane.style.display = index === i ? '' : 'none';
     });
     if (switching && i === 0) suppressCollageTapUntil = Date.now() + SLIDE_MS + 160;
     if (options.persist !== false) writeLS(VIEW_STORAGE_KEY, String(i));
-    views.style.transform = 'translateX(-' + (i * 100) + '%)';
+    views.style.transform = lowPowerFrame ? 'none' : 'translateX(-' + (i * 100) + '%)';
     btns.forEach(function (b, j) { b.setAttribute('aria-current', j === i ? 'true' : 'false'); });
     syncPill(slider);
-    setTitleForView(i);
+    setTitleForView(i, { immediate: lowPowerFrame });
     requestAnimationFrame(syncCompactHeader);
     if (!switching) return;
     if (lowPowerFrame && DATA) {

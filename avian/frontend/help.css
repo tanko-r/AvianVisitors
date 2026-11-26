@@ -34,4 +34,12 @@
 .typical-audio-buttons .suggestion-send { flex: 1 1 0; min-width: 0; padding: 10px 8px; font-size: clamp(8px, 1.3vw, 10px); letter-spacing: .04em; white-space: nowrap; }
 #typicalBirdcall[aria-pressed="true"] { box-shadow: var(--recess); background: var(--paper-2); }
 .rec-vocalization { display: block; font: 10px/1.5 ui-monospace, monospace; color: var(--ink-soft); grid-column: 1 / -1; }
+.touch-test { border: 0; position: fixed; inset: 0; width: 100vw; height: 100vh; max-width: none; max-height: none; padding: 0; background: #eeeae4; color: #171411; }
+.touch-test::backdrop { background: #171411; }
+.touch-target { position: absolute; transform: translate(-50%, -50%); width: 54px; height: 54px; border: 3px solid #171411; border-radius: 50%; background: #fff; font: 24px monospace; pointer-events: none; }
+.touch-target::before, .touch-target::after { content: ''; position: absolute; background: #171411; }
+.touch-target::before { width: 2px; height: 70px; top: -11px; left: 23px; }
+.touch-target::after { height: 2px; width: 70px; left: -11px; top: 23px; }
+.touch-test-note { position: absolute; top: 38%; left: 15%; width: 70%; text-align: center; font: 18px/1.5 ui-monospace, monospace; pointer-events: none; }
+#touchTestClose { position: absolute; top: 12px; right: 12px; padding: 12px; }
 #typicalBirdsong[aria-pressed="true"] { box-shadow: var(--recess); background: var(--paper-2); }

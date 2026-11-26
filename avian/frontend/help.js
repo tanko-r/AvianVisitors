@@ -6,6 +6,35 @@
   var text = document.getElementById('suggestionText');
   var status = document.getElementById('suggestionStatus');
   var sending = false;
+  var test = document.getElementById('touchTest');
+  var target = document.getElementById('touchTarget');
+  var note = document.getElementById('touchTestNote');
+  var points = [[.12,.15],[.88,.15],[.5,.5],[.12,.85],[.88,.85]], samples = [], targetAt;
+  function nextTarget() {
+    var point = points[samples.length];
+    target.hidden = !point;
+    if (!point) {
+      var dx = samples.reduce(function(s,p){return s+p.dx;},0)/samples.length;
+      var dy = samples.reduce(function(s,p){return s+p.dy;},0)/samples.length;
+      var max = Math.max.apply(null,samples.map(function(p){return Math.hypot(p.dx,p.dy);}));
+      note.textContent = 'Finished. Average offset: ' + dx.toFixed(1) + ' px right, ' + dy.toFixed(1) + ' px down. Largest miss: ' + max.toFixed(1) + ' px. ' + (max <= 18 ? 'Alignment looks reasonable.' : 'Repeat carefully; consistent misses may indicate scaling or touch alignment trouble.');
+      window.__avianTouchTest = { samples: samples.slice(), dx: dx, dy: dy, max: max };
+      return;
+    }
+    targetAt = { x: innerWidth*point[0], y: innerHeight*point[1] };
+    target.style.left = targetAt.x+'px'; target.style.top = targetAt.y+'px';
+    note.textContent = 'Tap the center of target ' + (samples.length+1) + ' of 5. Close is always available in the top right.';
+  }
+  document.getElementById('touchTestStart').addEventListener('click', function () {
+    samples = []; test.showModal(); nextTarget();
+  });
+  document.getElementById('touchTestClose').addEventListener('click', function () { test.close(); });
+  test.addEventListener('pointerdown', function (event) {
+    if (event.target.closest('button') || samples.length >= points.length) return;
+    event.preventDefault();
+    samples.push({ dx: event.clientX-targetAt.x, dy: event.clientY-targetAt.y, x: event.clientX, y: event.clientY });
+    nextTarget();
+  });
   button.addEventListener('click', function () { if (!dialog.open) dialog.showModal(); });
   document.getElementById('helpClose').addEventListener('click', function () { dialog.close(); });
   dialog.addEventListener('close', function () { button.focus({ preventScroll: true }); });
