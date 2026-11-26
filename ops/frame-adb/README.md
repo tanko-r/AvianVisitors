@@ -22,6 +22,10 @@ use it temporarily as an attended maintenance cable arrangement.
 
 ## Restricted temporary Wi-Fi ADB
 
+For the reboot-safe setup now installed on this frame, see
+[PERSISTENT.md](PERSISTENT.md). The commands below describe the older,
+temporary USB-enabled workflow only.
+
 `avian-frame-network-adb` supports an attended maintenance session on a new
 Wi-Fi network. It requires direct USB only while enabling or disabling access:
 

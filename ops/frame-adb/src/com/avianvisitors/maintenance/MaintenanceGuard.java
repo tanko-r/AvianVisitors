@@ -48,6 +48,9 @@ public final class MaintenanceGuard {
       if (!privateIP(ip)) throw new IOException("invalid peer");
       command("iptables -I AVIAN_ADB 1 -s " + ip + " -p tcp --dport 5555 -j ACCEPT");
       allowed = ip;
+      // Android 6 can retain the old host's dead TCP transport after a DHCP
+      // move. Reset transports only when granting a newly verified address.
+      command("setprop service.adb.tcp.port 5555; stop adbd; start adbd");
     }
     android.util.Log.i(TAG, allowed.isEmpty() ? "ADB access blocked" : "Pinned Pi address authorized");
   }

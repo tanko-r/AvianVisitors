@@ -291,17 +291,17 @@
     pointer-events: none; z-index: 0;
   }
 
-  /* Strong physical-display contrast: a white active tab on a dark track. */
+  /* Keep the original warm-paper palette, with a darker recessed track. */
   #winPick, #slider, .atlas-sort, .theme-pick, .labels-pick {
-    background: #49443e; --pill: #ffffff;
+    background: #c9c2b6; --pill: #ffffff;
   }
-  #winPick button, #slider button, .atlas-sort button { color: #eeeae4; }
+  #winPick button, #slider button, .atlas-sort button { color: #51483d; }
   #winPick button[aria-current="true"], #slider button[aria-current="true"],
   .atlas-sort button[aria-current="true"] { color: #171411; }
-  #winPick button:hover, #slider button:hover { color: #ffffff; }
+  #winPick button:hover, #slider button:hover { color: #171411; }
   #winPick button[aria-current="true"]:hover, #slider button[aria-current="true"]:hover { color: #171411; }
-  #newFriends { background: #49443e; color: #ffffff; }
-  #newFriends[aria-pressed="true"] { background: #ffffff; color: #171411; outline: 2px solid #49443e; }
+  #newFriends { background: #c9c2b6; color: #51483d; }
+  #newFriends[aria-pressed="true"] { background: #ffffff; color: #171411; outline: 1px solid #aaa093; }
   .frame-lite .slider button { min-height: 44px; padding: 11px 26px; }
   .frame-lite .window-pick button { min-height: 36px; }
 
