@@ -91,8 +91,14 @@ try:
         # Wake immediately when Chromium creates a playback stream, rather
         # than losing the first seconds of a short bird call to polling.
         if events and events.poll() is None:
-            if select.select([events.stdout], [], [], 1)[0]:
-                os.read(events.stdout.fileno(), 8192)
+            deadline = time.monotonic() + 1
+            while not stopping and time.monotonic() < deadline:
+                remaining = max(0, deadline - time.monotonic())
+                if not select.select([events.stdout], [], [], remaining)[0]:
+                    break
+                update = os.read(events.stdout.fileno(), 8192)
+                if not update or b' on sink-input ' in update:
+                    break
         else:
             time.sleep(1)
 finally:

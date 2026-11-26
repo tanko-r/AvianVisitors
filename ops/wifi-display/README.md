@@ -122,8 +122,9 @@ restart. Music volume remains the frame's normal media volume.
 
 Verified: APK build/install, active frame AudioTrack and loopback-only forward,
 reference audio progressing in Chromium, and user initially reported sound.
-User requested another listening test after dismissing the keyboard; that
-confirmation is pending. Full cold-boot ordering with this new audio service
+The first actual-kiosk retest was silent because it used a separate PulseAudio
+session; installed the startup script with explicit PULSE_SERVER/PULSE_SINK and
+restarted the kiosk. A further physical confirmation is pending. Full cold-boot ordering with this new audio service
 is still a shipping check. To roll back audio, stop/disable its Pi user unit;
 remove the PULSE_SINK line from the kiosk startup if returning to a Pi speaker.
 No Wi-Fi, VNC credentials, microphone configuration or capture jobs are changed.

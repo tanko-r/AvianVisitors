@@ -72,5 +72,14 @@
   restored1, then one Back dismissed IME and supplied AVNC window event. Verified
   mInputShown=false, AVNC foreground, native Menu accessibility overlay present.
   Awaiting second listening confirmation; do not claim physical audio retest done.
+- User's second listening test was silent. Diagnostic browser used the user
+  PulseAudio session while the actual kiosk used a separate session. Installed
+  the updated startup script (explicit PULSE_SERVER and PULSE_SINK), restarted
+  kiosk and audio relay; live VNC reconnected and IME remained hidden. Asked
+  user to repeat listening with actual kiosk; awaiting confirmation. Closed
+  diagnostic headless browser to prevent its playback confusing physical tests.
+- Subscription routing ignores client connect/disconnect events from its own
+  pactl queries to avoid a feedback loop. New sink-input events wake routing
+  immediately; periodic checks retain bounded recovery.
 - New audio path not yet cold-boot tested. Earlier persistent maintenance reboot
   and Pi-address-change tests are separate; do not conflate them.
