@@ -83,3 +83,10 @@
   immediately; periodic checks retain bounded recovery.
 - New audio path not yet cold-boot tested. Earlier persistent maintenance reboot
   and Pi-address-change tests are separate; do not conflate them.
+- Final actual-kiosk verification: injected frame tap opened American Robin
+  and played Typical Song. Its Chromium sink-input was routed to avian_frame;
+  monitored sample peak13556 (nonzero). User subsequently confirmed “Yes, it
+  plays.” Keyboard hidden, native Menu available. Species colors approved.
+  Help X/outside, swipe/modal exclusions, six consecutive edge switches and
+  one-visible-pane behavior passed browser checks. Final work committed/pushed
+  on frame-views-sync and Pi pulled forward; untracked handoff preserved.
