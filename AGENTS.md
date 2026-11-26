@@ -11,6 +11,11 @@ the performance patch and display-operation files are intentional local work.
 
 ## Follow-up reminder
 
+Persistent Pi-only wireless ADB is installed as of 2026-11-25. Read
+`ops/frame-adb/PERSISTENT.md` before changing frame maintenance. The signed
+address guard replaces the old temporary USB-only workflow. Never bypass
+the guard or persist an unfiltered TCP ADB port; keep its signing key private.
+
 Before improving the app, review the Pi's visitor suggestion checklist at
 `/var/lib/avian-visitors/suggestions/TODO.md` when it exists. It is local runtime
 data, outside the web root and Git; do not publish or commit visitor messages.

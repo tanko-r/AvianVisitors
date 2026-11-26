@@ -14,6 +14,11 @@
 }
 .help-dialog::backdrop { background: rgba(0, 0, 0, .4); }
 .help-dialog h2 { margin: 0 28px 18px 0; font-size: 26px; }
+.help-dialog #helpClose {
+  position: sticky; top: 0; right: auto; float: right; z-index: 2;
+  width: 48px; height: 48px; min-width: 48px; margin: -10px -10px 6px 12px;
+  color: #171411; background: #e4dfd5; font-size: 24px;
+}
 .help-dialog p { margin: 12px 0; }
 .help-dialog form { margin-top: 22px; border-top: 1px solid var(--ink-soft); padding-top: 18px; }
 .help-dialog label { display: block; }

@@ -35,8 +35,20 @@
     samples.push({ dx: event.clientX-targetAt.x, dy: event.clientY-targetAt.y, x: event.clientX, y: event.clientY });
     nextTarget();
   });
-  button.addEventListener('click', function () { if (!dialog.open) dialog.showModal(); });
+  button.addEventListener('click', function () {
+    if (!dialog.open) {
+      dialog.showModal(); dialog.scrollTop = 0;
+      document.getElementById('helpClose').focus({ preventScroll: true });
+      requestAnimationFrame(function () { dialog.scrollTop = 0; });
+    }
+  });
   document.getElementById('helpClose').addEventListener('click', function () { dialog.close(); });
+  dialog.addEventListener('click', function (event) {
+    var r = dialog.getBoundingClientRect();
+    if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) {
+      event.stopPropagation(); dialog.close();
+    }
+  });
   dialog.addEventListener('close', function () { button.focus({ preventScroll: true }); });
   form.addEventListener('submit', function (event) {
     event.preventDefault();
