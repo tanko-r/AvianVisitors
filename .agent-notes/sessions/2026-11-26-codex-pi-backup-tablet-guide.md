@@ -44,3 +44,7 @@
 - Physical spare-card restoration/boot test remains outstanding. Archive checks
   do not satisfy that shipping check. Tablet cold-start/audio checks and the
   undeployed 10:30 PM/5:30 AM panel schedule remain pending as documented.
+- At user's request, added root SESSION-HANDOFF.md consolidating current frame
+  behavior, audio/keyboard recovery, persistent maintenance, verified backup,
+  deployment state and next shipping checks. Linked it from the preserved local
+  PROJECT-HANDOFF.md. Rechecked core Pi services and audio active before handoff.
