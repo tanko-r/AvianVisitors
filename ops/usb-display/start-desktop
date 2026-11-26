@@ -1,5 +1,7 @@
 #!/bin/sh
 set -eu
 export XDG_SESSION_TYPE=x11
+export PULSE_SERVER=unix:/run/user/1000/pulse/native
+export PULSE_SINK=avian_frame
 /usr/bin/openbox --sm-disable &
 exec /usr/bin/chromium --ozone-platform=x11 --kiosk --no-first-run --no-default-browser-check --disable-session-crashed-bubble --disable-dev-shm-usage --disable-gpu --user-data-dir=/home/david/.config/avian-display/chromium 'http://127.0.0.1/?performance=lite'

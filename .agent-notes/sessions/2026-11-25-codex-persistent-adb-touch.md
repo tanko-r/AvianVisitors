@@ -44,6 +44,33 @@
   so do not claim that probe as evidence of successful physical dismissal.
 - User accepted the softened palette. Final code includes sticky 48px guide
   close target, outside dismissal, scroll reset, and larger view buttons.
-- Final guard reboot check after transport fix is in progress. Test UI was
-  closed with Escape before reboot so the dashboard can return cleanly.
+- Final guard reboot check passed after waiting for Android boot completion
+  and retrying fail-closed initialization. Pi wireless serial verified, guard
+  process running, only Pi source allowed, /system read-only, AVNC foreground.
 - Nightly screen schedule remains pending; unrelated private state preserved.
+
+## Swipe navigation, species contrast and frame speaker (same session)
+
+- User requested horizontal swipes, large far-left/right navigation targets,
+  short lightweight animation and stronger species-card control contrast.
+  Implemented cyclic edge navigation and horizontal swipe recognition excluding
+  interactive controls/open dialogs/species boxes. Frame animates only arriving
+  pane by 14px for 140ms; reduced-motion honored, rapid switches cancel animation.
+  Species controls match accepted warm #c9c2b6 palette, white active states;
+  recording play targets now 44px with matching enlarged control rows.
+- VNC did not carry sound. Added companion loopback-only FrameAudio receiver
+  and Pi private playback sink/PCM relay via serial-verified Pi-only ADB forward.
+  No microphone capture or new LAN audio listener. Built/installed signed APK
+  on Windows; enabled Pi user audio service and user lingering. Browser startup
+  selects private playback sink for future launches; existing playback rerouted.
+- Browser checks passed six edge switches (exactly one pane visible), horizontal
+  swipe, blocking view changes while species modal open, help X and outside
+  dismissal. Reference audio played with advancing currentTime. Frame showed
+  active native AudioTrack; Pi forward bound127.0.0.1 only.
+- User initially heard sound and approved species colors, then requested another
+  sound test after clearing keyboard. APK update reset accessibility_enabled=0;
+  restored1, then one Back dismissed IME and supplied AVNC window event. Verified
+  mInputShown=false, AVNC foreground, native Menu accessibility overlay present.
+  Awaiting second listening confirmation; do not claim physical audio retest done.
+- New audio path not yet cold-boot tested. Earlier persistent maintenance reboot
+  and Pi-address-change tests are separate; do not conflate them.

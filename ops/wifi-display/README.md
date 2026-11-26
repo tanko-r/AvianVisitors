@@ -94,6 +94,40 @@ Physical Settings confirmation is still required before final launcher lockdown.
 
 ## Remaining deployment checks
 
+### Speaker relay added 2026-11-25
+
+VNC carries the picture and input, not audio. `FrameAudio` in the companion
+accepts 22050 Hz mono signed 16-bit little-endian PCM on **127.0.0.1:8766 only**.
+The Pi user service `avian-frame-audio.service` creates a separate PulseAudio
+playback sink and moves Chromium playback into it. `frame-audio-relay.py`
+captures that sink's monitor (never the microphone), and sends it through a
+Pi-loopback ADB forward on 18766 to the frame. It checks the exact frame serial
+before forwarding; address candidates come from current inbound SSH sessions
+and must route over wlan0. No audio listener is exposed to the LAN.
+
+This requires the persistent Pi-only ADB guard in `../frame-adb/PERSISTENT.md`.
+Install the rebuilt companion with the existing Windows signing key. After an
+APK update, restore the existing accessibility-service entry and set
+`accessibility_enabled=1`; verify the native Menu and hidden keyboard. The
+vendor can reset this flag on update. A visible keyboard may need one Back
+event to generate the AVNC window event after rebinding the service.
+
+Install the audio unit under `/home/david/.config/systemd/user/`, enable user
+lingering, and enable/start `avian-frame-audio.service` as david. The updated
+`../usb-display/start-desktop` explicitly selects the private PulseAudio socket
+and frame sink for future kiosk launches; install it to the existing private
+desktop-start path. The relay also routes already-running Chromium streams.
+It retries after connection loss, frame restart, or the guarded ADB transport
+restart. Music volume remains the frame's normal media volume.
+
+Verified: APK build/install, active frame AudioTrack and loopback-only forward,
+reference audio progressing in Chromium, and user initially reported sound.
+User requested another listening test after dismissing the keyboard; that
+confirmation is pending. Full cold-boot ordering with this new audio service
+is still a shipping check. To roll back audio, stop/disable its Pi user unit;
+remove the PULSE_SINK line from the kiosk startup if returning to a Pi speaker.
+No Wi-Fi, VNC credentials, microphone configuration or capture jobs are changed.
+
 1. Owner physically opens Android Settings by touch; final gift lockdown is
    not configured by this trial. Native Menu is deliberately available.
 2. Confirm real wall-adapter cold starts with the PC unplugged, both Pi/frame

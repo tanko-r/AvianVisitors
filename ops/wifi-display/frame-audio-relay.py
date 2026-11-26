@@ -2,6 +2,8 @@
 """Forward only Chromium's playback sink to the serial-verified frame over ADB."""
 import ipaddress
 import json
+import os
+import select
 import signal
 import subprocess
 import time
@@ -25,6 +27,7 @@ signal.signal(signal.SIGTERM, stop)
 signal.signal(signal.SIGINT, stop)
 stream = None
 device = None
+events = None
 try:
     while not stopping:
         try:
@@ -32,9 +35,15 @@ try:
             if not any(s['name'] == SINK for s in sinks):
                 run('pactl', 'load-module', 'module-null-sink', 'sink_name=' + SINK,
                     'rate=22050', 'channels=1', 'sink_properties=device.description=Frame_Speaker')
+                sinks = json.loads(run('pactl', '-f', 'json', 'list', 'sinks'))
+            sink_index = next(s['index'] for s in sinks if s['name'] == SINK)
+            if events is None or events.poll() is not None:
+                events = subprocess.Popen(['pactl', 'subscribe'], stdout=subprocess.PIPE,
+                                          stderr=subprocess.DEVNULL)
             for item in json.loads(run('pactl', '-f', 'json', 'list', 'sink-inputs')):
                 props = item.get('properties', {})
-                if 'chrom' in props.get('application.process.binary', '').lower():
+                if ('chrom' in props.get('application.process.binary', '').lower()
+                        and item['sink'] != sink_index):
                     run('pactl', 'move-sink-input', str(item['index']), SINK)
             if device:
                 if run('adb', '-s', device, 'get-state') != 'device':
@@ -79,11 +88,17 @@ try:
                 except subprocess.SubprocessError:
                     pass
             device = None
-        for _ in range(5):
-            if stopping:
-                break
+        # Wake immediately when Chromium creates a playback stream, rather
+        # than losing the first seconds of a short bird call to polling.
+        if events and events.poll() is None:
+            if select.select([events.stdout], [], [], 1)[0]:
+                os.read(events.stdout.fileno(), 8192)
+        else:
             time.sleep(1)
 finally:
+    if events:
+        events.terminate()
+        events.wait(timeout=3)
     if stream:
         stream.terminate()
         try:
