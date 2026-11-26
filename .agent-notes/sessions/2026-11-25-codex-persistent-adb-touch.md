@@ -90,3 +90,15 @@
   Help X/outside, swipe/modal exclusions, six consecutive edge switches and
   one-visible-pane behavior passed browser checks. Final work committed/pushed
   on frame-views-sync and Pi pulled forward; untracked handoff preserved.
+
+## Invisible edges and actual VNC swipes
+
+- User requested invisible side targets and reported swipe failure. The earlier
+  synthetic pointer test did not cover the VNC event translation. Inspected
+  AVNC source and selected existing preference: gesture_swipe1 is already
+  remote-scroll, so browser receives horizontal wheel events, not pointer drags.
+  No AVNC configuration changed. Added horizontal-wheel burst navigation with
+  one switch per burst, vertical scrolling unaffected, modal exclusions retained.
+  Removed visible edge arrows/background/border while retaining target dimensions,
+  labels and keyboard-focus outline. Updated help instructions and asset versions.
+- Physical-path injected swipe verification pending deployment below.

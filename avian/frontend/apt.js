@@ -290,6 +290,26 @@
       event.preventDefault(); event.stopImmediatePropagation();
     }
   }, true);
+  // AVNC forwards a touchscreen swipe as horizontal wheel packets rather
+  // than a browser pointer drag. Treat one packet burst as one view change.
+  var wheelLastAt = 0, wheelTravel = 0, wheelSwitched = false;
+  document.addEventListener('wheel', function (event) {
+    if (navigationBlocked() || !event.target.closest('#views, .view-edge') ||
+        Math.abs(event.deltaX) <= Math.abs(event.deltaY) * 1.6) return;
+    event.preventDefault();
+    var now = Date.now();
+    if (now - wheelLastAt > 300) { wheelTravel = 0; wheelSwitched = false; }
+    wheelLastAt = now;
+    if (wheelSwitched) return;
+    var delta = event.deltaX * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerWidth : 1);
+    if (wheelTravel * delta < 0) wheelTravel = 0;
+    wheelTravel += delta;
+    if (Math.abs(wheelTravel) >= 40) {
+      wheelSwitched = true;
+      suppressSwipeClickUntil = now + 500;
+      stepView(wheelTravel > 0 ? 1 : -1);
+    }
+  }, { passive: false, capture: true });
 
   // The admin overlay's back link is intentionally stronger than ordinary
   // refresh persistence: "back to collage" should still mean collage.
