@@ -12,7 +12,7 @@ exec('/usr/sbin/ip -4 -o addr show dev wlan0 scope global', $lines, $status);
 if ($status !== 0 || !preg_match('/\binet ([0-9.]+)\//', implode('\n', $lines), $m)) avian_api_fail(503, 'WLAN unavailable');
 $address = $m[1];
 if (!avian_private_address($address)) avian_api_fail(503, 'invalid WLAN address');
-$key = @file_get_contents('/etc/avianvisitors/frame-maintenance/signing.pem');
+$key = @file_get_contents('/etc/avian-frame-maintenance/signing.pem');
 $payload = "avian-frame-maintenance-v1\n$nonce\n$address";
 if (!$key || !openssl_sign($payload, $signature, $key, OPENSSL_ALGO_SHA256)) avian_api_fail(503, 'proof unavailable');
 echo json_encode(['address' => $address, 'nonce' => $nonce, 'signature' => base64_encode($signature)]);
