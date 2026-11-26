@@ -80,3 +80,6 @@ requirements_custom.txt
 # Purchased personal-use Cornell audio; never publish with source.
 avian/assets/*Cornell*.zip
 ops/frame-adb/build/
+
+# Private restorable device images and filesystem staging (contain credentials).
+/device-backups/
