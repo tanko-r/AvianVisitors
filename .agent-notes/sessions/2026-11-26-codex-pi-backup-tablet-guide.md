@@ -4,13 +4,13 @@
 - Project: /home/david/Projects/avianvisitors, branch frame-views-sync.
 - User requested an SD backup here and tablet setup instructions, confirmed
   the Pi system card, then clarified a whole-card image was unnecessary.
-- Verified private file-based backup completed06:04 PST under
-  device-backups/pi-20261126/ on the development computer. Parent0700,
-  archive/metadata0600, excluded from Git. Private capture logs/helper scripts
+- Verified private file-based backup completed at 06:04 PST under
+  device-backups/pi-20261126/ on the development computer. Parent mode 0700,
+  archive and metadata files mode 0600, excluded from Git. Private capture logs/helper scripts
   are in capture-logs. Temporary rootfs staging removed only after verification.
   Never deploy this bundle into a web root, publish it or commit it.
 - Captures system files, all historical recordings, reference library, detection
-  database, configuration/private state,946-package inventory, enabled services,
+  database, configuration/private state, a 946-package inventory, enabled services,
   partition layout and original FAT boot partition, retaining numeric ownership,
   ACLs and xattrs. Virtual mounts, temporary files, common caches, swap and Git
   reflog cache omitted. User explicitly authorized the device backup; original
@@ -20,13 +20,13 @@
   and tracked files seeded to avoid retransferring history; rsync reconciled
   source/device-only files. Git connectivity check passed.
 - Boot partition captured read-only then returned read-write. Package inventory
-  compared unchanged afterward. Initial live rsync returned24 for transient
-  files; subsequent live refresh and quiesced final sync returned0. No raw
+  compared unchanged afterward. Initial live rsync returned 24 for transient
+  files; subsequent live refresh and quiesced final sync returned 0. No raw
   writes or restore operation performed on the source card.
-- Application units paused05:58:19, final sync finished05:58:35, all restored
-  05:58:39 (about20 seconds).15-minute recovery watchdog arranged before pause,
+- Application units paused at 05:58:19, final sync finished at 05:58:35, all restored at
+  05:58:39 (about 20 seconds). A 15-minute recovery watchdog arranged before pause,
   disabled after restart. SSH/network/discovery remained available.
-- Snapshot revision a804697. pi-rootfs.tar.zst is6,563,944,645 bytes. Compressed
+- Snapshot revision a804697. pi-rootfs.tar.zst is 6,563,944,645 bytes. Compressed
   boot partition and SHA256SUMS accompany it. manifest.json status complete.
 - Passed detection SQLite quick_check, Git connectivity, boot size/signature/
   gzip integrity, zstd integrity, tar header scan, restoration of five critical
@@ -43,4 +43,4 @@
   committed/pushed and Pi synced; untracked user-owned handoff preserved.
 - Physical spare-card restoration/boot test remains outstanding. Archive checks
   do not satisfy that shipping check. Tablet cold-start/audio checks and the
-  undeployed10:30 PM/5:30 AM panel schedule remain pending as documented.
+  undeployed 10:30 PM/5:30 AM panel schedule remain pending as documented.
