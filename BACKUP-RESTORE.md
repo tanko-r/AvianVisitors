@@ -5,7 +5,7 @@ This directory is excluded from Git and accessible only to its owner/root.
 It contains system credentials and personal recordings. Keep it private.
 
 This is a file-based system backup, not a sector image of unused card space.
-The planned bundle is:
+The bundle is:
 
 | File | Purpose |
 | --- | --- |
@@ -23,6 +23,10 @@ Files ending in `.partial` and filesystem staging directories are not a finished
 backup. Temporary files, mounted runtime filesystems, caches and the swap file
 are excluded. BirdNET recordings, the reference audio library, private settings,
 SSH keys and service definitions are included in the filesystem backup.
+Git objects reachable from the Pi's saved refs were verified against this
+checkout and reused locally to avoid retransferring public history. Its
+reflog cache is omitted; saved branches, current source and device-only files
+are retained.
 
 ## Verify before restoring
 

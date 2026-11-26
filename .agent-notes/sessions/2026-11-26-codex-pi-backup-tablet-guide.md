@@ -20,3 +20,20 @@
   and still-pending overnight schedule/cold-boot tests. BACKUP-RESTORE.md records
   bundle format, checksum checks and Linux replacement-card restore procedure.
 - Backup completion/verification pending. Do not describe as completed yet.
+- Boot partition remounted read-only for capture, then returned to its original
+  read-write state. Compressed FAT image saved and gzip-tested. Partition table,
+  946-entry package inventory and enabled-service lists saved privately.
+- Avoided retransferring large Git packs: all eight source ref tips and their
+  reachable graphs checked locally; one missing source-only tip fetched without
+  creating a public ref. Local objects seeded into backup, Git connectivity
+  check passed. Reflog cache omitted. Tracked project files also seeded locally;
+  rsync still compares source and transfers differences/device-only files.
+- Initial capture currently running as exec session61034, private progress log
+  device-backups/pi-20261126/rsync-system.log. Prior interrupted staging passes
+  are intentionally superseded, not completed backups.
+- Private finalize.py prepared (syntax checked, not yet run): records active
+  application units, arranges a 15-minute resume watchdog, stops writers for
+  final incremental rsync, restores services in finally, validates application
+  SQLite databases/Git/boot data, archives rootfs with tar+zstd preserving ACLs
+  and xattrs, then verifies compressed stream/tar/checksums. Manifest remains
+  in_progress until finished. Raw staging must remain private.

@@ -97,7 +97,14 @@ use its existing ADB installation. Always scope commands to the frame serial:
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 & $adb devices -l
 & $adb -s a0082c68081700000000 shell getprop ro.serialno
+& $adb -s a0082c68081700000000 shell am start -n com.avianvisitors.display/.MainActivity
 ```
+
+The last command opens the Bird display recovery screen; select **Open bird
+display** there. Its **Android Settings** button also provides a way out of
+the Aimor welcome screen. In Android Settings → Accessibility, enable **Bird
+display controls** if an APK update has turned it off, then return and reopen
+the bird display.
 
 If a keyboard is visibly covering AVNC, one scoped `shell input keyevent 4`
 dismisses it. If the frame is stuck in Wi-Fi settings, a Back event returns to
