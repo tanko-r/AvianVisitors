@@ -169,7 +169,8 @@
   // begins just as the view arrives - no dead pause, still snappy. Collage's
   // bloom reads fine mid-slide, so it starts immediately (no lead). Stats
   // reads as starting a hair slower than atlas, so it gets a shorter lead.
-  var SLIDE_MS = lowPowerFrame ? 0 : 480;
+  var SLIDE_MS = lowPowerFrame ? 140 : 480;
+  var viewAnimation = null;
   var SWITCH_LEAD = SLIDE_MS - 100;   // atlas
   var STATS_LEAD = SLIDE_MS - 200;    // stats - begin a touch sooner
   var VIEW_STORAGE_KEY = 'bird:view';
@@ -198,7 +199,9 @@
     // a card is expanded (it sets the #sci= hash, which routes through go(2))
     // while already on the atlas - that must not retrigger the load-in.
     var switching = (i !== currentView);
+    var previousView = currentView;
     currentView = i;
+    if (viewAnimation) { viewAnimation.cancel(); viewAnimation = null; }
     resetStageOffset();
     [].forEach.call(views.querySelectorAll('.view'), function (pane, index) {
       pane.inert = index !== i;
@@ -213,6 +216,15 @@
     setTitleForView(i, { immediate: lowPowerFrame });
     requestAnimationFrame(syncCompactHeader);
     if (!switching) return;
+    if (lowPowerFrame && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var arriving = document.getElementById('v' + i);
+      // Move only the arriving sheet a few pixels; never animate the full
+      // three-screen canvas over VNC or leave an outgoing pane interactive.
+      if (arriving.animate) viewAnimation = arriving.animate([
+        { transform: 'translateX(' + (i > previousView ? 14 : -14) + 'px)' },
+        { transform: 'translateX(0)' }
+      ], { duration: SLIDE_MS, easing: 'ease-out' });
+    }
     if (lowPowerFrame && DATA) {
       if (i === 0 && collageDirty && DATA.recent) renderCollageFromData(false);
       if (i === 1 && DATA.stats && statsDirty) renderStatsContext(false);
@@ -245,6 +257,39 @@
   // normal cross-view title transition during the initial page load.
   if (staticTitle) staticTitle.textContent = titleForView(currentView);
   go(currentView, { persist: false });
+
+  function navigationBlocked() {
+    return document.body.classList.contains('admin-on') ||
+      document.querySelector('dialog[open], #postcard-modal[aria-hidden="false"], .modal.is-open');
+  }
+  function stepView(direction) {
+    if (!navigationBlocked()) go((currentView + direction + 3) % 3);
+  }
+  document.getElementById('viewPrevious').addEventListener('click', function () { stepView(-1); });
+  document.getElementById('viewNext').addEventListener('click', function () { stepView(1); });
+  var swipe = null, suppressSwipeClickUntil = 0;
+  views.style.touchAction = 'pan-y';
+  views.addEventListener('pointerdown', function (event) {
+    if (event.isPrimary === false || event.button !== 0 || navigationBlocked() ||
+        event.target.closest('button, input, textarea, select, a, audio, video, [role="slider"]')) return;
+    swipe = { id: event.pointerId, x: event.clientX, y: event.clientY, at: Date.now() };
+  });
+  document.addEventListener('pointerup', function (event) {
+    if (!swipe || swipe.id !== event.pointerId) return;
+    var dx = event.clientX - swipe.x, dy = event.clientY - swipe.y;
+    var elapsed = Date.now() - swipe.at;
+    swipe = null;
+    if (elapsed < 1200 && Math.abs(dx) >= 70 && Math.abs(dx) > Math.abs(dy) * 1.6 && !navigationBlocked()) {
+      suppressSwipeClickUntil = Date.now() + 500;
+      stepView(dx < 0 ? 1 : -1);
+    }
+  });
+  document.addEventListener('pointercancel', function () { swipe = null; });
+  document.addEventListener('click', function (event) {
+    if (Date.now() < suppressSwipeClickUntil) {
+      event.preventDefault(); event.stopImmediatePropagation();
+    }
+  }, true);
 
   // The admin overlay's back link is intentionally stronger than ordinary
   // refresh persistence: "back to collage" should still mean collage.

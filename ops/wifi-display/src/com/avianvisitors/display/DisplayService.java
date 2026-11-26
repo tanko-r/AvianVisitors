@@ -16,6 +16,7 @@ public class DisplayService extends Service {
   private WifiManager.MulticastLock multicast;
   private String lastHost;
   private boolean listening;
+  private FrameAudio audio;
   private final BroadcastReceiver network = new BroadcastReceiver() {
     @Override public void onReceive(Context context, Intent intent) {
       if (discovery != null) discovery.onNetworkChanged();
@@ -38,6 +39,8 @@ public class DisplayService extends Service {
         note.setChannelId("display");
       }
       startForeground(11, note.build());
+      audio = new FrameAudio();
+      audio.start();
       WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
       if (wifi != null) {
         multicast = wifi.createMulticastLock("bird-display-discovery");
@@ -73,6 +76,7 @@ public class DisplayService extends Service {
     return START_STICKY;
   }
   @Override public void onDestroy() {
+    if (audio != null) audio.close();
     if (listening) unregisterReceiver(network);
     if (discovery != null) discovery.close();
     if (multicast != null && multicast.isHeld()) multicast.release();

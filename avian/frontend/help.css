@@ -48,3 +48,35 @@
 .touch-test-note { position: absolute; top: 38%; left: 15%; width: 70%; text-align: center; font: 18px/1.5 ui-monospace, monospace; pointer-events: none; }
 #touchTestClose { position: absolute; top: 12px; right: 12px; padding: 12px; }
 #typicalBirdsong[aria-pressed="true"] { box-shadow: var(--recess); background: var(--paper-2); }
+
+/* Match the warmer, darker navigation controls inside each species card. */
+#postcard-modal .typical-audio-buttons button,
+#postcard-modal .rec-player-toggle,
+#postcard-modal .modal-close,
+#postcard-modal .postcard-pose-toggle button {
+  background: #c9c2b6; color: #3d352c; border: 1px solid #a89e90;
+  opacity: 1;
+}
+#postcard-modal .rec-player-toggle { width: 44px; height: 44px; }
+#postcard-modal .rec-player-controls { height: 48px; grid-template-columns: 44px minmax(0, 1fr) auto; }
+#postcard-modal .rec-spectro canvas,
+#postcard-modal .rec-spectro img { height: calc(100% - 48px); }
+#postcard-modal .rec-spectro-scrub,
+#postcard-modal .rec-spectro-played,
+#postcard-modal .rec-spectro-cursor,
+#postcard-modal .rec-spectro-loading,
+#postcard-modal .rec-loop-handle,
+#postcard-modal .rec-loop-region { bottom: 48px; }
+#postcard-modal .rec-loop-toggle { min-height: 40px; background: #c9c2b6; color: #3d352c; }
+#postcard-modal .rec-loop-toggle[aria-pressed="true"] { background: #fff; color: #171411; }
+#postcard-modal .rec-player-toggle[data-active="true"],
+#postcard-modal .typical-audio-buttons button[aria-pressed="true"],
+#postcard-modal .postcard-pose-toggle button[aria-current="true"] {
+  background: #fff; color: #171411; border-color: #887b6b;
+}
+#postcard-modal .rec-player-toggle:hover { background: #ded8ce; opacity: 1; }
+#postcard-modal .rec-player-time,
+#postcard-modal .rec-vocalization,
+#postcard-modal .typical-birdsong-caption { color: #51483d; }
+#postcard-modal .rec-player-toggle[data-error="true"],
+#postcard-modal button:disabled { opacity: .5; }

@@ -160,6 +160,17 @@
     position: relative; display: flex;
     transition: transform 480ms cubic-bezier(.7,.05,.2,1);
   }
+  .view-edge {
+    position: fixed; top: 38%; height: 24vh; min-height: 100px; width: 48px;
+    z-index: 20; border: 1px solid #aca293; border-radius: 14px;
+    background: #c9c2b6; color: #51483d; font: 40px/1 Georgia, serif;
+    cursor: pointer; touch-action: manipulation;
+  }
+  .view-edge-left { left: 0; border-left: 0; border-radius: 0 14px 14px 0; }
+  .view-edge-right { right: 0; border-right: 0; border-radius: 14px 0 0 14px; }
+  .view-edge:active, .view-edge:focus-visible { background: #fff; color: #171411; }
+  body.admin-on .view-edge { display: none; }
+  @media (max-width: 700px) { .view-edge { width: 32px; font-size: 30px; } }
   body.educator-data-loading #views { visibility: hidden; pointer-events: none; }
   .educator-data-loading-state {
     position: absolute; left: 50%; top: 56%; z-index: 4;

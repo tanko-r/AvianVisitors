@@ -14,7 +14,7 @@
 function systemTheme(){try{return window.matchMedia&&window.matchMedia(q).matches?'dark':'light';}catch(e){return'light';}}
 function preference(){try{var v=localStorage.getItem('bird:theme:v2');if(v==='auto'||v==='light'||v==='dark')return v;var old=localStorage.getItem('bird:theme');return old==='light'||old==='dark'?old:'auto';}catch(e){return'auto';}}
 var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemTheme());})();</script>
-  <link rel="stylesheet" href="./styles.css?v=frame-20261125-4">
+  <link rel="stylesheet" href="./styles.css?v=frame-20261125-5">
   <link rel="stylesheet" href="./bundles.css?v=r3">
   <link rel="stylesheet" href="./stamps.css?v=r355">
   <link rel="stylesheet" href="./stamp-batch-root.css?v=r254">
@@ -335,6 +335,8 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <button type="button" data-i="1">stats</button>
   <button type="button" data-i="2">atlas</button>
 </nav>
+<button type="button" class="view-edge view-edge-left" id="viewPrevious" aria-label="Previous view">‹</button>
+<button type="button" class="view-edge view-edge-right" id="viewNext" aria-label="Next view">›</button>
 
 
 <!-- Native Settings, System, Logs, Tools, and Educators views render here. The live JS
@@ -406,7 +408,7 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <script src="./stamp-batch-b.js?v=r318"></script>
 <script src="./stamp-batch-c.js?v=r235"></script>
 <script src="./bundle-ui.js?v=r11"></script>
-<script src="./apt.js?v=frame-20261125-3"></script>
+<script src="./apt.js?v=frame-20261125-4"></script>
 <script src="./avian/frontend/typical-birdsong.js?v=3"></script>
 <button type="button" id="helpButton" class="help-button" aria-label="Help and suggestions" aria-haspopup="dialog">?</button>
 <dialog id="helpDialog" class="help-dialog" aria-labelledby="helpTitle">
@@ -416,6 +418,7 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <p><strong>Collage</strong> shows your visitors. Tap a bird to learn about it and listen to recordings. Close its box to return to your view.</p>
   <p><strong>Typical Song</strong> and <strong>Typical Call</strong> play separate Cornell examples when available. Songs often serve courtship or territory; calls can signal contact, alarm, and other messages. Local recordings are currently marked unclassified because BirdNET identifies species, not song versus call.</p>
   <p><strong>Stats</strong> shows activity over time. <strong>Atlas</strong> lets you browse and sort the birds.</p>
+  <p>Swipe sideways across a view, or tap the large arrows at the left and right edges, to switch views. Recording controls and open bird boxes keep their own gestures.</p>
   <p><strong>New Friends</strong> shows birds heard in your chosen period but absent in the preceding 10 days, or 60 days for the 7-day window.</p>
   <button type="button" class="suggestion-send" id="touchTestStart">Test touch alignment</button>
   <p>Tap five targets to measure where the frame reports your touches. This measures alignment; it does not change calibration.</p>
@@ -431,7 +434,7 @@ var p=preference();d.setAttribute('data-theme',p==='light'||p==='dark'?p:systemT
   <div class="touch-test-note" id="touchTestNote"></div>
   <div class="touch-target" id="touchTarget" aria-hidden="true">+</div>
 </dialog>
-<link rel="stylesheet" href="./avian/frontend/help.css?v=7">
+<link rel="stylesheet" href="./avian/frontend/help.css?v=8">
 <script src="./avian/frontend/help.js?v=6"></script>
 </body>
 </html>
