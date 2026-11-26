@@ -4,7 +4,7 @@
   var performanceMode = new URLSearchParams(location.search).get('performance');
   var lowPowerFrame = performanceMode === 'lite' ||
     (performanceMode !== 'full' && /Android 6\.0.*AEEZO/.test(navigator.userAgent));
-  var collageDirty = false, atlasDirty = false;
+  var collageDirty = false, atlasDirty = false, statsDirty = true;
   if (lowPowerFrame) {
     document.documentElement.classList.add('frame-lite');
     var performanceStyle = document.createElement('style');
@@ -215,7 +215,7 @@
     if (!switching) return;
     if (lowPowerFrame && DATA) {
       if (i === 0 && collageDirty && DATA.recent) renderCollageFromData(false);
-      if (i === 1 && DATA.stats) renderStatsContext(false);
+      if (i === 1 && DATA.stats && statsDirty) renderStatsContext(false);
       if (i === 2 && atlasDirty && DATA.lifelist) renderAtlas(false);
     }
     // Replay the view's entrance animation on switch (collage bloom,
@@ -6093,6 +6093,7 @@
     renderAtlas(animate);
   }
   function renderTimeIndependent(animate) {
+    if (lowPowerFrame) statsDirty = currentView !== 1;
     // Lists first, then the graph (see renderWindowDependent).
     renderStatsLists();
     drawHistograms(animate);
@@ -6102,6 +6103,8 @@
   }
 
   function renderStatsContext(animate) {
+    if (lowPowerFrame && currentView !== 1) { statsDirty = true; return; }
+    statsDirty = false;
     hourlyExpanded = false;
     renderStatsLists();
     drawHistograms(animate);
