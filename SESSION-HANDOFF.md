@@ -58,6 +58,22 @@ backup, AVNC was connected and the keyboard was hidden.
 Relevant source: `avian/frontend/apt.js`, `styles.css`, `help.js`, `help.css`,
 `ops/wifi-display/`, and `ops/usb-display/start-desktop`.
 
+## Caddy helper and reference audio — 2026-11-26
+
+The installed `/usr/local/sbin/avian-caddy-refresh` had lagged the repository;
+refreshing the app's already-disabled LAN admin password regenerated an older
+Caddyfile and caused 404s for reference audio, help, suggestions and frame
+maintenance proof. The installed helper was updated to match the tracked
+`scripts/update_caddyfile.sh` and Caddy was refreshed. Reference metadata,
+partial audio, help, suggestions routing, the frame maintenance route and
+serial-verified wireless ADB were checked. Keep the installed root-owned helper
+in sync with its tracked source whenever the route list changes.
+
+LAN admin access is configured without a password. Access via Tailscale or a
+public address still requires admin authentication; David asked to disable the
+app password entirely, and the intended scope of that remaining remote gate
+needs clarification. SSH and frame credentials are separate.
+
 ## Direct laptop Ethernet — 2026-11-26
 
 The Windows laptop's existing public SSH key was added to the Pi's authorized
