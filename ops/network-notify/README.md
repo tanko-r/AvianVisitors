@@ -20,6 +20,15 @@ NetworkManager. Failed sends do not update state; a later Wi-Fi event retries.
 There is deliberately no tight retry loop, both to avoid duplicate alerts and
 to keep WhatsApp traffic low.
 
+## Operator computer access note
+
+On the operator computer, `update-access-details.py` polls the Pi over SSH and
+writes the ignored, mode-0600 `REMOTE-ACCESS.txt` in the checkout. It records
+the Wi-Fi LAN IP, Tailscale IP, SSH commands, and last successful check time.
+When the Pi is unreachable the last successful note is retained. A user
+systemd timer on that computer runs it every two minutes; the computer must be
+on and connected to Tailscale. This is separate from the WhatsApp notifier.
+
 ## Frame ADB from the Pi
 
 The Pi already has Android platform tools, the exact PF1007L serial, and a

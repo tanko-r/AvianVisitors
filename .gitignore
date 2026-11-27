@@ -83,3 +83,4 @@ ops/frame-adb/build/
 
 # Private restorable device images and filesystem staging (contain credentials).
 /device-backups/
+/REMOTE-ACCESS.txt
