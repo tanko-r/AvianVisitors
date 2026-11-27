@@ -58,6 +58,18 @@ backup, AVNC was connected and the keyboard was hidden.
 Relevant source: `avian/frontend/apt.js`, `styles.css`, `help.js`, `help.css`,
 `ops/wifi-display/`, and `ops/usb-display/start-desktop`.
 
+## Direct laptop Ethernet — 2026-11-26
+
+The Windows laptop's existing public SSH key was added to the Pi's authorized
+keys. A direct USB-Ethernet connection was verified using IPv4 link-local while
+both devices remained on Wi-Fi. The Pi's NetworkManager profile
+`avian-laptop-direct` uses link-local IPv4/IPv6 and low autoconnect priority;
+it was added because the existing DHCP profile disconnected after timing out
+with the laptop directly attached. Address assignments may change. Windows can
+resolve `birdnet.local` to Wi-Fi while both interfaces are active; use the
+Ethernet address to prove which path is in use. Confirm cable autoactivation and
+name discovery after reboot or moving networks before relying on this for travel.
+
 ## Persistent maintenance
 
 Persistent Pi-only wireless ADB is installed and tested across frame reboot and
