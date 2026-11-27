@@ -45,7 +45,7 @@ def main() -> None:
             f'Tailscale IP: {tailnet}\n'
             f'Remote SSH: ssh david@{tailnet}\n'
             f'Local-network SSH: ssh david@{lan}\n\n'
-            'This file is refreshed on this computer every two minutes while it is on.\n'
+            'This file is refreshed on this computer every two hours while it is on.\n'
             'If the Pi is unreachable, these are the last known details; check the timestamp.\n'
             'Tailscale SSH requires the Pi and your device to be online and authorized.\n'
         )

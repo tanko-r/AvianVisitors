@@ -26,7 +26,7 @@ On the operator computer, `update-access-details.py` polls the Pi over SSH and
 writes the ignored, mode-0600 `REMOTE-ACCESS.txt` in the checkout. It records
 the Wi-Fi LAN IP, Tailscale IP, SSH commands, and last successful check time.
 When the Pi is unreachable the last successful note is retained. A user
-systemd timer on that computer runs it every two minutes; the computer must be
+systemd timer on that computer runs it every two hours; the computer must be
 on and connected to Tailscale. This is separate from the WhatsApp notifier.
 
 ## Frame ADB from the Pi
