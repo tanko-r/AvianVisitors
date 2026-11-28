@@ -1208,7 +1208,6 @@
 
   // Open-space click advances these segmented toggles to the next option.
   wireToggleAdvance(slider);
-  wireToggleAdvance(winPick);
   wireToggleAdvance(atlasSortEl);
   wireToggleAdvance(document.getElementById('modalPoseToggle'));
   function syncAllPills() {

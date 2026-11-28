@@ -315,9 +315,7 @@
   #newFriends { background: #c9c2b6; color: #51483d; }
   #newFriends[aria-pressed="true"] { background: #ffffff; color: #171411; outline: 1px solid #aaa093; }
   .frame-lite .slider button { min-height: 44px; padding: 11px 26px; }
-  @media (min-width: 701px) {
-    .frame-lite .window-pick button { min-width: 52px; min-height: 48px; }
-  }
+  .frame-lite .window-pick button { min-height: 36px; }
 
   /* ============ Menu dropdown ============ */
   /* ============ Menu - the button IS the card ============
